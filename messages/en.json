@@ -1,0 +1,10 @@
+{
+  "login": {
+    "title": "Welcome to JOSH Nomination App",
+    "mobile": "Mobile Number",
+    "otp": "Request OTP",
+    "login": "Login",
+    "invalid": "Invalid",
+    "resend": "Resend"
+  }
+}
