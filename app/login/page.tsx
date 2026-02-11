@@ -5,7 +5,6 @@ import { Box, Typography, TextField, Button, Paper } from '@mui/material';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CircularProgress from '@mui/material/CircularProgress';
 import InputAdornment from '@mui/material/InputAdornment';
-import { useTranslations } from 'next-intl';
 import { useState, useEffect } from 'react';
 import { MuiOtpInput } from 'mui-one-time-password-input';
 import Title1 from '@/components/Titel1';
@@ -15,7 +14,6 @@ import en from '@/messages/en.json';
 import { redirect } from 'next/navigation';
 
 function LoginPage() {
-  const t = useTranslations('login');
   const [loading, setLoading] = useState(false);
   const [mobile, setMobile] = useState('');
   const [fillOtp, setFillOtp] = useState(false);
@@ -39,37 +37,35 @@ function LoginPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [canResend]);
+  }, [resend]);
 
   const resendOtp = () => {
     if (!canResend) return;
-    SetResend(true);
-    handleRequestOTP();
+    setCanResend(false);
+    setFillOtp(true);
+    setSeconds(60);
+    validteAndSendOtp();
   };
 
   const handleRequestOTP = async () => {
     setLoading(true);
-    if (resend) {
-      validteAndSendOtp();
-    } else {
-      if (fillOtp) {
-        if (otp.length >= 6 && otp == '123456') {
-          addToast({
-            type: 'success',
-            hi: hi?.login?.login_success,
-            en: en?.login?.login_success,
-          });
-          redirect('/dashboard');
-        } else {
-          addToast({
-            type: 'error',
-            hi: hi?.login?.invalid,
-            en: en?.login?.invalid,
-          });
-        }
+    if (fillOtp) {
+      if (otp.length >= 6 && otp == '123456') {
+        addToast({
+          type: 'success',
+          hi: hi?.login?.login_success,
+          en: en?.login?.login_success,
+        });
+        redirect('/dashboard');
       } else {
-        validteAndSendOtp();
+        addToast({
+          type: 'error',
+          hi: hi?.login?.invalid,
+          en: en?.login?.invalid,
+        });
       }
+    } else {
+      validteAndSendOtp();
     }
     setLoading(false);
   };
@@ -89,6 +85,7 @@ function LoginPage() {
       });
       setFillOtp(true);
       setCanResend(false);
+      SetResend(!resend);
     } else {
       addToast({
         type: 'error',
