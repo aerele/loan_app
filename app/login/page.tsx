@@ -8,6 +8,10 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { MuiOtpInput } from 'mui-one-time-password-input';
+import Title1 from '@/components/Titel1';
+import { addToast } from '@/components/error/toastStore';
+import hi from '@/messages/hi.json';
+import en from '@/messages/en.json';
 
 function LoginPage() {
   const t = useTranslations('login');
@@ -15,7 +19,7 @@ function LoginPage() {
   const [mobile, setMobile] = useState('');
   const [fillOtp, setFillOtp] = useState(false);
   const [otp, setOtp] = useState('');
-  const [otpError, setOtpError] = useState(true);
+  const [resend, SetResend] = useState(true);
 
   const handleMainAction = () => {
     console.log('hi');
@@ -23,7 +27,11 @@ function LoginPage() {
 
   const handleRequestOTP = async () => {
     setLoading(true);
-
+    addToast({
+      type: 'success',
+      hi: 'OTP भेजा गया',
+      en: 'OTP Sent',
+    });
     setTimeout(() => {
       setLoading(false);
       setFillOtp(true);
@@ -87,11 +95,14 @@ function LoginPage() {
             <AccountBalanceIcon sx={{ fontSize: 32 }} />
           </Box>
 
-          <Typography variant="h5" fontWeight={700} gutterBottom>
-            {t('title')}
-          </Typography>
+          <Title1
+            h1={hi.login.title}
+            h2={en.login.title}
+            h1style={{ fontSize: 22, fontWeight: 700 }}
+            h2style={{ fontWeight: 500, mb: 2 }}
+          />
 
-          <Box>
+          <Box sx={{ mt: 2 }}>
             {fillOtp ? (
               <Box>
                 <MuiOtpInput
@@ -109,7 +120,7 @@ function LoginPage() {
                     },
                   }}
                 />
-                {otpError && (
+                {resend && (
                   <Box
                     sx={{
                       display: 'flex',
@@ -119,10 +130,9 @@ function LoginPage() {
                   >
                     <Typography
                       fontSize={14}
-                      color={otpError ? 'error' : 'text.secondary'}
+                      color={resend ? 'error' : 'text.secondary'}
                       mb={2}
                     >
-                      OTP {t('invalid')}.&nbsp;
                       <Box
                         component="span"
                         sx={{
@@ -131,7 +141,13 @@ function LoginPage() {
                         }}
                         onClick={handleRequestOTP}
                       >
-                        {t('resend')}
+                        <Title1
+                          h1={hi.login.resend}
+                          h2={`(${en.login.resend})`}
+                          boxStyle={{ display: 'flex', flexDirection: 'row' }}
+                          h1style={{ fontSize: 14, fontWeight: 600 }}
+                          h2style={{ pl: 1 }}
+                        />
                       </Box>
                     </Typography>
                   </Box>
@@ -139,9 +155,12 @@ function LoginPage() {
               </Box>
             ) : (
               <Box>
-                <Typography fontWeight={600} mb={1}>
-                  {t('mobile')}
-                </Typography>
+                <Title1
+                  h1={hi.login.mobile}
+                  h2={en.login.mobile}
+                  h1style={{ fontSize: 22, fontWeight: 600 }}
+                  h2style={{ fontWeight: 300, mb: 2 }}
+                />
                 <TextField
                   fullWidth
                   placeholder="0123456789"
@@ -186,9 +205,20 @@ function LoginPage() {
               <CircularProgress size={24} sx={{ color: '#fff' }} />
             ) : (
               <Box textAlign="center">
-                <Typography fontWeight={600}>
-                  {fillOtp ? t('login') : t('otp')}
-                </Typography>
+                <Title1
+                  h1={fillOtp ? hi.login.login : hi.login.otp}
+                  h2={fillOtp ? en.login.login : en.login.otp}
+                  h1style={{
+                    fontWeight: 600,
+                    textAlign: 'center',
+                    fontSize: 14,
+                  }}
+                  h2style={{
+                    fontWeight: 400,
+                    fontSize: 'small',
+                    textAlign: 'center',
+                  }}
+                />
               </Box>
             )}
           </Button>
