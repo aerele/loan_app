@@ -1,34 +1,52 @@
 'use client';
 
-import { Box, Typography, Button, Paper } from '@mui/material';
+import { Box, Button, Paper } from '@mui/material';
+import Title1 from '../Titel1';
+import hi from '@/messages/hi.json';
+import en from '@/messages/en.json';
 
-export default function CreateNominationBox() {
+function CreateNominationBox() {
   return (
     <Paper
       sx={{
-        p: 3,
-        borderRadius: 4,
+        p: 2,
+        borderRadius: 2,
         backgroundColor: 'white',
       }}
     >
-      <Typography fontWeight={700}>नया नामांकन शुरू कर</Typography>
-
-      <Typography color="text.secondary" mb={2}>
-        Create New Nomination
-      </Typography>
-
+      <Title1
+        h1={hi?.dashboard?.nomi_new}
+        h2={en?.dashboard?.nomi_new}
+        h1style={{ fontSize: '1.1rem', fontWeight: 600 }}
+        h2style={{ fontWeight: 400, fontSize: '0.8rem', mb: 1 }}
+      />
       <Button
         fullWidth
         sx={{
           backgroundColor: '#000',
           color: '#fff',
-          borderRadius: 3,
-          py: 1.5,
+          borderRadius: 2,
+          py: 1,
           textTransform: 'none',
+          '&:hover': {
+            backgroundColor: '#333',
+          },
         }}
       >
-        Create Nomination
+        <Title1
+          h1={hi?.dashboard?.create_nomination}
+          h2={en?.dashboard?.create_nomination}
+          h1style={{
+            fontWeight: 600,
+            fontSize: '0.9rem',
+          }}
+          h2style={{
+            fontWeight: 400,
+            fontSize: '0.75rem',
+          }}
+        />
       </Button>
     </Paper>
   );
 }
+export default CreateNominationBox;
