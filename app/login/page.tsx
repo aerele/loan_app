@@ -15,6 +15,7 @@ import { redirect } from 'next/navigation';
 
 function LoginPage() {
   const [loading, setLoading] = useState(false);
+
   const [mobile, setMobile] = useState('');
   const [fillOtp, setFillOtp] = useState(false);
   const [otp, setOtp] = useState('');
@@ -154,8 +155,8 @@ function LoginPage() {
           <Title1
             h1={hi.login.title}
             h2={en.login.title}
-            h1style={{ fontSize: 22, fontWeight: 700 }}
-            h2style={{ fontWeight: 500, mb: 2 }}
+            h1style={{ fontSize: 20, fontWeight: 700 }}
+            h2style={{ fontWeight: 500, mb: 2, fontSize: 14 }}
           />
 
           <Box sx={{ mt: 2 }}>
@@ -169,10 +170,14 @@ function LoginPage() {
                   sx={{
                     gap: 1,
                     mb: 2,
-                    py: 2,
+                    py: 1,
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 3,
                       backgroundColor: '#F9FAFB',
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      fontSize: 16,
+                      py: 1.5,
                     },
                   }}
                 />
@@ -195,64 +200,32 @@ function LoginPage() {
                       cursor: canResend ? 'pointer' : 'not-allowed',
                     }}
                     h1style={{
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: canResend ? 700 : 400,
                       color: canResend ? '#000' : '#9CA3AF',
                     }}
                     h2style={{
                       pl: 1,
+                      fontSize: 13,
                       fontWeight: canResend ? 600 : 400,
                       color: canResend ? '#000' : '#9CA3AF',
                     }}
                   />
 
                   {!canResend && (
-                    <Typography sx={{ ml: 1, fontSize: 14, color: '#9CA3AF' }}>
+                    <Typography sx={{ ml: 1, fontSize: 13, color: '#9CA3AF' }}>
                       {seconds}s
                     </Typography>
                   )}
                 </Box>
-
-                {/* {resend && (
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Typography
-                      fontSize={14}
-                      color={resend ? 'error' : 'text.secondary'}
-                      mb={2}
-                    >
-                      <Box
-                        component="span"
-                        sx={{
-                          cursor: 'pointer',
-                          color: '#000',
-                        }}
-                        onClick={resendOtp}
-                      >
-                        <Title1
-                          h1={hi.login.resend}
-                          h2={`(${en.login.resend})`}
-                          boxStyle={{ display: 'flex', flexDirection: 'row' }}
-                          h1style={{ fontSize: 14, fontWeight: 600 }}
-                          h2style={{ pl: 1 }}
-                        />
-                      </Box>
-                    </Typography>
-                  </Box>
-                )} */}
               </Box>
             ) : (
               <Box>
                 <Title1
                   h1={hi.login.mobile}
                   h2={en.login.mobile}
-                  h1style={{ fontSize: 22, fontWeight: 600 }}
-                  h2style={{ fontWeight: 300, mb: 2 }}
+                  h1style={{ fontSize: 18, fontWeight: 600 }}
+                  h2style={{ fontWeight: 300, mb: 2, fontSize: 14 }}
                 />
                 <TextField
                   fullWidth
@@ -264,10 +237,16 @@ function LoginPage() {
                       borderRadius: 3,
                       backgroundColor: '#F9FAFB',
                     },
+                    '& .MuiOutlinedInput-input': {
+                      fontSize: 15,
+                      py: 1.5,
+                    },
                   }}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">+91</InputAdornment>
+                      <InputAdornment position="start">
+                        <Typography sx={{ fontSize: 15 }}>+91</Typography>
+                      </InputAdornment>
                     ),
                   }}
                   onChange={(e) => mobilbumber(e.target.value)}
@@ -304,11 +283,11 @@ function LoginPage() {
                   h1style={{
                     fontWeight: 600,
                     textAlign: 'center',
-                    fontSize: 14,
+                    fontSize: 15,
                   }}
                   h2style={{
                     fontWeight: 400,
-                    fontSize: 'small',
+                    fontSize: 12,
                     textAlign: 'center',
                   }}
                 />

@@ -10,5 +10,16 @@
     "invalid_number": "अमान्य नंबर",
     "enter_number": "सही नंबर डालें",
     "login_success": "लॉगिन सफल रहा"
+  },
+
+  "dashboard": {
+    "create_nomination": "नया नामांकन शुरू कर",
+    "nomi_new": "नामांकन बनाएँ",
+    "submitted_nominatio": "नॉमिनेशन जमा किया गया",
+    "training": "स्वीकृति के लिए तैयार",
+    "credit_limit": "क्रेडिट सीमा",
+    "no_data": "कोई डेटा नहीं मिला",
+    "ent_type": "उद्यम का प्रकार",
+    "review": "नामांकन की समीक्षा कर"
   }
 }
