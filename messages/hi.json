@@ -4,7 +4,11 @@
     "mobile": "मोबाइल नंबर",
     "otp": "ओटीपी प्राप्त करें",
     "login": "प्रवेश",
-    "invalid": "अमान्य",
-    "resend": "दोबारा भेजें"
+    "invalid": "OTP अमान्य",
+    "resend": "दोबारा भेजें",
+    "otp_sent": "OTP भेजा गया",
+    "invalid_number": "अमान्य नंबर",
+    "enter_number": "सही नंबर डालें",
+    "login_success": "लॉगिन सफल रहा"
   }
 }

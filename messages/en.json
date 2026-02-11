@@ -4,7 +4,11 @@
     "mobile": "Mobile Number",
     "otp": "Request OTP",
     "login": "Login",
-    "invalid": "Invalid",
-    "resend": "Resend"
+    "invalid": "Invalid OTP",
+    "resend": "Resend",
+    "otp_sent": "OTP Sent",
+    "invalid_number": "Invalid mobile number",
+    "enter_number": "Enter valid number",
+    "login_success": "Login Successful"
   }
 }
