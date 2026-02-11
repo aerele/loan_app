@@ -6,12 +6,13 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CircularProgress from '@mui/material/CircularProgress';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MuiOtpInput } from 'mui-one-time-password-input';
 import Title1 from '@/components/Titel1';
 import { addToast } from '@/components/error/toastStore';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
+import { redirect } from 'next/navigation';
 
 function LoginPage() {
   const t = useTranslations('login');
@@ -19,25 +20,83 @@ function LoginPage() {
   const [mobile, setMobile] = useState('');
   const [fillOtp, setFillOtp] = useState(false);
   const [otp, setOtp] = useState('');
-  const [resend, SetResend] = useState(true);
+  const [resend, SetResend] = useState(false);
+  const [seconds, setSeconds] = useState(60);
+  const [canResend, setCanResend] = useState(false);
 
-  const handleMainAction = () => {
-    console.log('hi');
+  useEffect(() => {
+    if (!fillOtp) return;
+
+    const interval = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [canResend]);
+
+  const resendOtp = () => {
+    if (!canResend) return;
+    SetResend(true);
+    handleRequestOTP();
   };
 
   const handleRequestOTP = async () => {
     setLoading(true);
-    addToast({
-      type: 'success',
-      hi: 'OTP भेजा गया',
-      en: 'OTP Sent',
-    });
-    setTimeout(() => {
-      setLoading(false);
-      setFillOtp(true);
-    }, 2000);
+    if (resend) {
+      validteAndSendOtp();
+    } else {
+      if (fillOtp) {
+        if (otp.length >= 6 && otp == '123456') {
+          addToast({
+            type: 'success',
+            hi: hi?.login?.login_success,
+            en: en?.login?.login_success,
+          });
+          redirect('/dashboard');
+        } else {
+          addToast({
+            type: 'error',
+            hi: hi?.login?.invalid,
+            en: en?.login?.invalid,
+          });
+        }
+      } else {
+        validteAndSendOtp();
+      }
+    }
+    setLoading(false);
   };
 
+  const validteAndSendOtp = () => {
+    if (mobile.length > 10) {
+      addToast({
+        type: 'error',
+        hi: hi?.login?.enter_number,
+        en: en?.login?.enter_number,
+      });
+    } else if (mobile == '7826844889') {
+      addToast({
+        type: 'success',
+        hi: hi?.login?.otp_sent,
+        en: en?.login?.otp_sent,
+      });
+      setFillOtp(true);
+      setCanResend(false);
+    } else {
+      addToast({
+        type: 'error',
+        hi: hi?.login?.invalid_number,
+        en: en?.login?.invalid_number,
+      });
+    }
+  };
   const mobilbumber = (value: string) => {
     const numbersOnly = value.replace(/\D/g, '');
     setMobile(numbersOnly);
@@ -120,7 +179,44 @@ function LoginPage() {
                     },
                   }}
                 />
-                {resend && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    mb: 2,
+                  }}
+                  onClick={resendOtp}
+                >
+                  <Title1
+                    h1={`${hi.login.resend}`}
+                    h2={`(${en.login.resend})`}
+                    boxStyle={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: canResend ? 'pointer' : 'not-allowed',
+                    }}
+                    h1style={{
+                      fontSize: 14,
+                      fontWeight: canResend ? 700 : 400,
+                      color: canResend ? '#000' : '#9CA3AF',
+                    }}
+                    h2style={{
+                      pl: 1,
+                      fontWeight: canResend ? 600 : 400,
+                      color: canResend ? '#000' : '#9CA3AF',
+                    }}
+                  />
+
+                  {!canResend && (
+                    <Typography sx={{ ml: 1, fontSize: 14, color: '#9CA3AF' }}>
+                      {seconds}s
+                    </Typography>
+                  )}
+                </Box>
+
+                {/* {resend && (
                   <Box
                     sx={{
                       display: 'flex',
@@ -139,7 +235,7 @@ function LoginPage() {
                           cursor: 'pointer',
                           color: '#000',
                         }}
-                        onClick={handleRequestOTP}
+                        onClick={resendOtp}
                       >
                         <Title1
                           h1={hi.login.resend}
@@ -151,7 +247,7 @@ function LoginPage() {
                       </Box>
                     </Typography>
                   </Box>
-                )}
+                )} */}
               </Box>
             ) : (
               <Box>
