@@ -3,6 +3,7 @@
 import { Box } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import UserHeader from '@/components/header/UserHeader';
+import AppHeader from '@/components/header/Appheader';
 import CreateNominationBox from '@/components/nomination/CreateNominationBox';
 import StatsButtons from '@/components/nomination/StatsButtons';
 import NominationCard from '@/components/nomination/NominationCard';
@@ -105,7 +106,7 @@ function DashboardPage() {
       }}
     >
       <Box sx={{ flexShrink: 0 }}>
-        <UserHeader />
+        <AppHeader showUser userName={'स्वाति दीक्षित'} />
       </Box>
 
       <Box

@@ -1,16 +1,23 @@
 'use client';
 
-import { Box, Typography, Paper, Button } from '@mui/material';
+import { Box, Typography, Paper, Button, SxProps, Theme } from '@mui/material';
 import Title1 from '../Titel1';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
+type NominationData = {
+  name: string;
+  id: string;
+  amount: number;
+  type: string;
+};
+
 type cardValue = {
-  data: cardValue;
-  canReview: boolean;
+  data: NominationData;
   cardSx?: SxProps<Theme>;
   approvedSx?: SxProps<Theme>;
+  canReview: boolean;
 };
 function NominationCard({ data, canReview, cardSx, approvedSx }: cardValue) {
   return (

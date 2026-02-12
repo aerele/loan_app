@@ -3,12 +3,18 @@
 import { Box, Typography, Paper } from '@mui/material';
 import CheckCircleSharpIcon from '@mui/icons-material/CheckCircleSharp';
 
-type cardValue = {
-  data: cardValue;
-  canReview: boolean;
+type NominationData = {
+  name: string;
+  id: string;
+  amount: number;
+  type: string;
 };
 
-function NominationCard2({ data, amount }: cardValue) {
+type cardValue = {
+  data: NominationData;
+};
+
+function NominationCard2({ data }: cardValue) {
   return (
     <Paper
       elevation={2}

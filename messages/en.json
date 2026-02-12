@@ -21,5 +21,17 @@
     "no_data": "No data available",
     "ent_type": "Enterprise Type",
     "review": "Review Nomination"
+  },
+
+  "form": {
+    "nomi_details": "Nominee Details",
+    "name": "Full Name ",
+    "pincode": "Pincode",
+    "dictrict": "District",
+    "area": "Town/ Village",
+    "adhaar": "Aadhaar Number ",
+    "permanent_address": "Permanent Address",
+    "pan": "PAN Number",
+    "dob": "Date of Birth"
   }
 }

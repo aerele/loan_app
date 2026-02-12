@@ -4,8 +4,12 @@ import { Box, Button, Paper } from '@mui/material';
 import Title1 from '../Titel1';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
+import { redirect } from 'next/navigation';
 
 function CreateNominationBox() {
+  const openNominationForm = () => {
+    redirect('/nomination');
+  };
   return (
     <Paper
       elevation={2}
@@ -23,6 +27,7 @@ function CreateNominationBox() {
       />
       <Button
         fullWidth
+        onClick={openNominationForm}
         sx={{
           backgroundColor: '#000',
           color: '#fff',
