@@ -2,7 +2,6 @@
 
 import { Box } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
-import UserHeader from '@/components/header/UserHeader';
 import AppHeader from '@/components/header/Appheader';
 import CreateNominationBox from '@/components/nomination/CreateNominationBox';
 import StatsButtons from '@/components/nomination/StatsButtons';
@@ -12,7 +11,6 @@ import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ApprovedCard from '@/components/nomination/ApprovedCard';
-import { BorderColor } from '@mui/icons-material';
 function DashboardPage() {
   const [show, setShow] = useState({
     submitted: true,

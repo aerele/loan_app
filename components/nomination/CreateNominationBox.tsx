@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 
 function CreateNominationBox() {
   const openNominationForm = () => {
-    redirect('/nomination');
+    redirect('/nomination_form/step-1');
   };
   return (
     <Paper

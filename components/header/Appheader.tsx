@@ -35,14 +35,12 @@ export default function AppHeader({
         flexShrink: 0,
       }}
     >
-      {/* Back Button */}
       {showBack && (
         <IconButton onClick={onBack}>
           <ArrowBackIcon />
         </IconButton>
       )}
 
-      {/* User Header */}
       {showUser && (
         <>
           <Avatar src="/user.png" />
@@ -55,14 +53,13 @@ export default function AppHeader({
         </>
       )}
 
-      {/* Title Header */}
       {!showUser && h1 && (
         <Box>
           <Title1
             h1={h1}
             h2={h2}
-            h1style={{ fontSize: 18, fontWeight: 600 }}
-            h2style={{ fontSize: 14 }}
+            h1style={{ fontSize: 14, fontWeight: 600 }}
+            h2style={{ fontSize: 12 }}
           />
         </Box>
       )}

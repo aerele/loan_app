@@ -12,11 +12,11 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Title1 from '@/components/Titel1';
-import Text from '../FormComponents/Text';
+import Text from '@/components/FormComponents/Text';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
-import AppHeader from '../header/Appheader';
-import NominationStepper from './NominationStepper';
+import AppHeader from '@/components/header/Appheader';
+import NominationStepper from '@/components/nomination/NominationStepper';
 
 const steps = ['1', '2', '3'];
 
@@ -37,8 +37,8 @@ function NominationStepOne() {
       <AppHeader
         showBack
         onBack={() => router.push('/dashboard')}
-        h1={hi?.form?.nomi_details}
-        h2={en?.form?.nomi_details}
+        h1={hi?.form?.nomi_form}
+        h2={en?.form?.nomi_form}
       />
       <Box
         sx={{
@@ -46,6 +46,7 @@ function NominationStepOne() {
           overflowY: 'auto',
           px: 2,
           py: 2,
+          pb: 5,
           '&::-webkit-scrollbar': {
             display: 'none',
           },
@@ -62,8 +63,8 @@ function NominationStepOne() {
           <NominationStepper activeStep={0} />
 
           <Title1
-            h1="नामांकित देवी का विवरण"
-            h2="Nominee Details"
+            h1={hi?.form?.nomi_details}
+            h2={en?.form?.nomi_details}
             h1style={{ fontSize: 18, fontWeight: 700 }}
             h2style={{ mb: 2, fontSize: 14 }}
           />
@@ -108,8 +109,6 @@ function NominationStepOne() {
             />
             <Text label_1={hi?.form?.dob} label_2={en?.form?.dob} type="date" />
           </Box>
-
-          {/* Button */}
           <Button
             fullWidth
             variant="contained"
@@ -121,12 +120,23 @@ function NominationStepOne() {
               textTransform: 'none',
               '&:hover': { bgcolor: '#111' },
             }}
+            onClick={() => router.push('/nomination_form/step-2')}
           >
             <Box textAlign="center">
-              <Typography fontWeight={600} fontSize={15}>
-                अगला चरण
-              </Typography>
-              <Typography fontSize={12}>Next Step</Typography>
+              <Title1
+                h1={hi?.form?.next_step}
+                h2={en?.form?.next_step}
+                h1style={{
+                  fontWeight: 600,
+                  textAlign: 'center',
+                  fontSize: 15,
+                }}
+                h2style={{
+                  fontWeight: 400,
+                  fontSize: 12,
+                  textAlign: 'center',
+                }}
+              />
             </Box>
           </Button>
         </Paper>

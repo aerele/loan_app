@@ -27,8 +27,8 @@ function Text({
         h1={label_1}
         boxStyle={{ ml: 0.5 }}
         h2={label_2}
-        h1style={{ fontSize: 12, fontWeight: 500 }}
-        h2style={{ mb: 0.5, fontWeight: 550, fontSize: 12 }}
+        h1style={{ fontSize: 13, fontWeight: 500 }}
+        h2style={{ mb: 0.5, fontWeight: 550, fontSize: 13 }}
       />
 
       <TextField
@@ -59,7 +59,7 @@ function Text({
               color: '#9CA3AF',
               opacity: 1,
               fontSize: '12px',
-              fontWeight: 600,
+              fontWeight: 400,
             },
           },
         }}
