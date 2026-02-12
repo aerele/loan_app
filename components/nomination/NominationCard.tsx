@@ -7,24 +7,26 @@ import en from '@/messages/en.json';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 type cardValue = {
-  name: string;
-  id: string;
-  amount: number;
-  type: string;
+  data: cardValue;
   canReview: boolean;
+  cardSx?: SxProps<Theme>;
+  approvedSx?: SxProps<Theme>;
 };
-function NominationCard({ name, id = '', amount, type, canReview }: cardValue) {
+function NominationCard({ data, canReview, cardSx, approvedSx }: cardValue) {
   return (
     <Paper
+      elevation={2}
       sx={{
         p: 1.5,
         borderRadius: 2,
-        borderLeft: '4px solid #000',
+        borderLeft: '4px solid',
+        borderColor: '#000',
+        ...cardSx,
       }}
     >
       <Title1
-        h1={name}
-        h2={`ID: ${id}`}
+        h1={data.name}
+        h2={`ID: ${data.id}`}
         h1style={{ fontSize: '1rem', fontWeight: 600 }}
         h2style={{
           fontWeight: 400,
@@ -47,7 +49,7 @@ function NominationCard({ name, id = '', amount, type, canReview }: cardValue) {
           h2style={{ fontWeight: 400, fontSize: '0.65rem', color: '#6B7280' }}
         />
         <Typography fontWeight={600} sx={{ fontSize: '0.9rem' }}>
-          ₹{amount}
+          ₹{data.amount}
         </Typography>
       </Box>
 
@@ -64,19 +66,32 @@ function NominationCard({ name, id = '', amount, type, canReview }: cardValue) {
           h2style={{ fontWeight: 400, fontSize: '0.65rem', color: '#6B7280' }}
         />
         <Typography sx={{ fontSize: '0.9rem' }} fontWeight={600}>
-          {type}
+          {data.type}
         </Typography>
       </Box>
 
-      <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center', mt: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 0.5,
+          alignItems: 'center',
+          mt: 1,
+          p: 1,
+          borderRadius: '10px',
+          ...approvedSx,
+        }}
+      >
         <CheckCircleIcon sx={{ fontSize: 14 }} />
-        <Typography sx={{ fontSize: '0.7rem', color: '#374151' }}>
+        <Typography sx={{ fontSize: '0.6rem', color: '#374151' }}>
           Approved by XYZ
         </Typography>
         <Typography
-          sx={{ fontSize: '0.7rem', fontWeight: 600, color: '#111827' }}
+          sx={{ fontSize: '0.6rem', fontWeight: 600, color: '#111827' }}
         >
           Maker group members
+        </Typography>
+        <Typography sx={{ fontSize: '0.6rem', color: '#374151' }}>
+          on 11 Jan, 3:15 PM
         </Typography>
       </Box>
 
