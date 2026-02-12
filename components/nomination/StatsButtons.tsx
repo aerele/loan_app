@@ -15,6 +15,7 @@ function StatsButtons({ h1, h2, count, show, onClick }: StatusMessage) {
   return (
     <Box sx={{ flex: 1, display: 'flex' }}>
       <Paper
+        elevation={2}
         onClick={onClick}
         sx={{
           flex: 1,

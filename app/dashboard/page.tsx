@@ -10,6 +10,8 @@ import Title1 from '@/components/Titel1';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ApprovedCard from '@/components/nomination/ApprovedCard';
+import { BorderColor } from '@mui/icons-material';
 function DashboardPage() {
   const [show, setShow] = useState({
     submitted: true,
@@ -52,7 +54,18 @@ function DashboardPage() {
     { name: 'Neha', id: 'ID-010', amount: 13500, type: 'Type 1' },
   ]);
 
-  const [approved] = useState([]);
+  const [approved] = useState([
+    { name: 'Ravi', id: 'ID-001', amount: 5000, type: 'Type 1' },
+    { name: 'Meena', id: 'ID-002', amount: 12000, type: 'Type 1' },
+    { name: 'Kumar', id: 'ID-003', amount: 8000, type: 'Type 1' },
+    { name: 'Anjali', id: 'ID-004', amount: 15000, type: 'Type 1' },
+    { name: 'Vikram', id: 'ID-005', amount: 2500, type: 'Type 1' },
+    { name: 'Sonia', id: 'ID-006', amount: 9500, type: 'Type 1' },
+    { name: 'Rahul', id: 'ID-007', amount: 4200, type: 'Type 1' },
+    { name: 'Priya', id: 'ID-008', amount: 11000, type: 'Type 1' },
+    { name: 'Arjun', id: 'ID-009', amount: 7000, type: 'Type 1' },
+    { name: 'Neha', id: 'ID-010', amount: 13500, type: 'Type 1' },
+  ]);
   const handleStatsChange = (type: 'submitted' | 'training') => {
     setShow({
       submitted: type === 'submitted',
@@ -135,22 +148,16 @@ function DashboardPage() {
                 ? nominations.map((item) => (
                     <NominationCard
                       key={item.id}
-                      name={item.name}
-                      id={item.id}
-                      amount={item.amount}
-                      type={item.type}
+                      data={item}
                       canReview={canReview}
                     />
                   ))
                 : NoData
               : approved.length > 0
                 ? nominations.map((item) => (
-                    <NominationCard
+                    <ApprovedCard
                       key={item.id}
-                      name={item.name}
-                      id={item.id}
-                      amount={item.amount}
-                      type={item.type}
+                      data={item}
                       canReview={canReview}
                     />
                   ))

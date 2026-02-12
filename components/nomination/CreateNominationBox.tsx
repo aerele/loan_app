@@ -8,6 +8,7 @@ import en from '@/messages/en.json';
 function CreateNominationBox() {
   return (
     <Paper
+      elevation={2}
       sx={{
         p: 2,
         borderRadius: 2,
