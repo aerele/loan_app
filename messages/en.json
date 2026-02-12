@@ -21,5 +21,26 @@
     "no_data": "No data available",
     "ent_type": "Enterprise Type",
     "review": "Review Nomination"
+  },
+
+  "form": {
+    "nomi_details": "Nominee Details",
+    "name": "Full Name ",
+    "pincode": "Pincode",
+    "dictrict": "District",
+    "area": "Town/ Village",
+    "adhaar": "Aadhaar Number ",
+    "permanent_address": "Permanent Address",
+    "pan": "PAN Number",
+    "dob": "Date of Birth",
+    "nomi_form": "Nomination Form",
+    "enterprise": "Enterprise Details",
+    "sector_type": "Sector Type",
+    "next_step": "Next Step",
+    "business_type": "Type of Business",
+    "support": "Select support needed (optional)",
+    "important": "Important - Final Review",
+    "final_review_desc": "Please review all information carefully. Once submitted, you cannot edit this application. To edit the application you need to press on the screen number at top.",
+    "check_credit": "Credit Check"
   }
 }
