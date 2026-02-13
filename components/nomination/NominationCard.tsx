@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Typography, Paper, Button, SxProps, Theme } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import Title1 from '../Titel1';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
@@ -18,10 +19,30 @@ type cardValue = {
   cardSx?: SxProps<Theme>;
   approvedSx?: SxProps<Theme>;
   canReview: boolean;
+  notshowapproved?: boolean;
+  form_approve?: boolean;
 };
-function NominationCard({ data, canReview, cardSx, approvedSx }: cardValue) {
+function NominationCard({
+  data,
+  canReview,
+  cardSx,
+  approvedSx,
+  notshowapproved,
+  form_approve,
+}: cardValue) {
+  const router = useRouter();
+  const openViewForm = () => {
+    if (form_approve) {
+      return;
+    } else if (canReview) {
+      router.push('/nomination_form/view_form?view=false');
+    } else {
+      router.push('/nomination_form/view_form?view=true');
+    }
+  };
   return (
     <Paper
+      onClick={openViewForm}
       elevation={2}
       sx={{
         p: 1.5,
@@ -77,30 +98,32 @@ function NominationCard({ data, canReview, cardSx, approvedSx }: cardValue) {
         </Typography>
       </Box>
 
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 0.5,
-          alignItems: 'center',
-          mt: 1,
-          p: 1,
-          borderRadius: '10px',
-          ...approvedSx,
-        }}
-      >
-        <CheckCircleIcon sx={{ fontSize: 14 }} />
-        <Typography sx={{ fontSize: '0.6rem', color: '#374151' }}>
-          Approved by XYZ
-        </Typography>
-        <Typography
-          sx={{ fontSize: '0.6rem', fontWeight: 600, color: '#111827' }}
+      {!notshowapproved && (
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 0.5,
+            alignItems: 'center',
+            mt: 1,
+            p: 1,
+            borderRadius: '10px',
+            ...approvedSx,
+          }}
         >
-          Maker group members
-        </Typography>
-        <Typography sx={{ fontSize: '0.6rem', color: '#374151' }}>
-          on 11 Jan, 3:15 PM
-        </Typography>
-      </Box>
+          <CheckCircleIcon sx={{ fontSize: 14 }} />
+          <Typography sx={{ fontSize: '0.6rem', color: '#374151' }}>
+            Approved by XYZ
+          </Typography>
+          <Typography
+            sx={{ fontSize: '0.6rem', fontWeight: 600, color: '#111827' }}
+          >
+            Maker group members
+          </Typography>
+          <Typography sx={{ fontSize: '0.6rem', color: '#374151' }}>
+            on 11 Jan, 3:15 PM
+          </Typography>
+        </Box>
+      )}
 
       {canReview && (
         <Box sx={{ mt: 1 }}>
@@ -116,6 +139,7 @@ function NominationCard({ data, canReview, cardSx, approvedSx }: cardValue) {
                 backgroundColor: '#333',
               },
             }}
+            onClick={openViewForm}
           >
             <Title1
               h1={hi?.dashboard?.review}

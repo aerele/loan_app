@@ -23,7 +23,7 @@ function NominationStepOne() {
   const [resend, SetResend] = useState(false);
   const [seconds, setSeconds] = useState(60);
   const [canResend, setCanResend] = useState(false);
-  const [showCredit, setShowCredit] = useState(true);
+  const [showCredit, setShowCredit] = useState(false);
   const [creditLimit, setCreditLimit] = useState('');
   const [score, setScore] = useState(800);
 
@@ -84,7 +84,9 @@ function NominationStepOne() {
     return () => clearInterval(interval);
   }, [resend]);
   const handleRequestOTP = async () => {
-    if (fillOtp) {
+    if (showCredit) {
+      router.push('/nomination_form/view_status');
+    } else if (fillOtp) {
       if (otp.length >= 6 && otp == '123456') {
         addToast({
           type: 'success',

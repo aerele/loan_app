@@ -27,6 +27,7 @@ function ApprovedCard({ data, canReview }: cardValue) {
             canReview={false}
             cardSx={{ borderLeft: '4px' }}
             approvedSx={{ backgroundColor: '#D1D5DB' }}
+            form_approve={true}
           />
         </Box>
       ) : (
