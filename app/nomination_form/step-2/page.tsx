@@ -1,18 +1,9 @@
 'use client';
 
-import {
-  Box,
-  Typography,
-  Button,
-  Stepper,
-  Step,
-  StepLabel,
-  Paper,
-} from '@mui/material';
+import { Box, Button, Paper } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import Title1 from '@/components/Titel1';
-import Text from '@/components/FormComponents/Text';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import AppHeader from '@/components/header/Appheader';
@@ -21,8 +12,6 @@ import NominationStepper from '@/components/nomination/NominationStepper';
 import SelectField from '@/components/FormComponents/SelectField';
 import CheckBoxMultiSelect from '@/components/FormComponents/CheckBoxMultiSelect';
 import ImportantNote from '@/components/nomination/ImportantNote';
-
-const steps = ['1', '2', '3'];
 
 function NominationStepOne() {
   const router = useRouter();
@@ -43,7 +32,7 @@ function NominationStepOne() {
     >
       <AppHeader
         showBack
-        onBack={() => router.push('/nomination_form/step-2')}
+        onBack={() => router.push('/nomination_form/step-1')}
         h1={hi?.form?.nomi_form}
         h2={en?.form?.nomi_form}
       />
@@ -149,10 +138,10 @@ function NominationStepOne() {
             />
 
             <ImportantNote
-              h1={hi.form.important}
-              h2={en.form.important}
-              desc_1={hi.form.final_review_desc}
-              desc_2={en.form.final_review_desc}
+              h1={hi.form.important_form}
+              h2={en.form.important_form}
+              desc_1={hi.form.final_review_desc_form}
+              desc_2={en.form.final_review_desc_form}
             />
           </Box>
 
@@ -172,7 +161,7 @@ function NominationStepOne() {
             <Box textAlign="center">
               <Title1
                 h1={hi?.form?.next_step}
-                h2={en?.form?.next_step}
+                h2={en?.form?.save_and_next}
                 h1style={{
                   fontWeight: 600,
                   textAlign: 'center',
