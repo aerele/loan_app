@@ -11,7 +11,7 @@ import Title1 from '@/components/Titel1';
 
 type Option = {
   label_1: string;
-  label_2: string;
+  label_2?: string;
   value: string;
 };
 
@@ -94,7 +94,8 @@ function SelectField({
                 },
               }}
             >
-              {option.label_1} ({option.label_2})
+              {option.label_1}{' '}
+              {option.label_2?.trim() ? ` (${option.label_2})` : ''}
             </MenuItem>
           ))}
         </Select>

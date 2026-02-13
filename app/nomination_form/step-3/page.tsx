@@ -1,35 +1,139 @@
 'use client';
 
-import {
-  Box,
-  Typography,
-  Button,
-  Stepper,
-  Step,
-  StepLabel,
-  Paper,
-} from '@mui/material';
+import { Box, Typography, Button, TextField, Paper } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { MuiOtpInput } from 'mui-one-time-password-input';
+import { useState, useEffect, useMemo } from 'react';
 import Title1 from '@/components/Titel1';
-import Text from '@/components/FormComponents/Text';
+import InputAdornment from '@mui/material/InputAdornment';
 import hi from '@/messages/hi.json';
+import { addToast } from '@/components/error/toastStore';
 import en from '@/messages/en.json';
 import AppHeader from '@/components/header/Appheader';
-import CheckBoxSingleSelect from '@/components/FormComponents/CheckBoxSingleSelect';
 import NominationStepper from '@/components/nomination/NominationStepper';
-import SelectField from '@/components/FormComponents/SelectField';
-import CheckBoxMultiSelect from '@/components/FormComponents/CheckBoxMultiSelect';
 import ImportantNote from '@/components/nomination/ImportantNote';
-
-const steps = ['1', '2', '3'];
+import CreditScoreGauge from '@/components/nomination/CreditScoreGauge';
+import SelectField from '@/components/FormComponents/SelectField';
 
 function NominationStepOne() {
   const router = useRouter();
-  const [activeStep] = useState(0);
-  const [sector, setSector] = useState('farm');
-  const [businessType, setBusinessType] = useState('');
-  const [supportNeeded, setSupportNeeded] = useState<string[]>([]);
+  const [mobile, setMobile] = useState('');
+  const [fillOtp, setFillOtp] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [resend, SetResend] = useState(false);
+  const [seconds, setSeconds] = useState(60);
+  const [canResend, setCanResend] = useState(false);
+  const [showCredit, setShowCredit] = useState(true);
+  const [creditLimit, setCreditLimit] = useState('');
+  const [score, setScore] = useState(800);
+
+  const resendOtp = () => {
+    if (!canResend) return;
+    setCanResend(false);
+    setFillOtp(true);
+    setSeconds(60);
+    validteAndSendOtp();
+  };
+
+  const remark = useMemo(() => {
+    if (score < 681) {
+      return {
+        l1: hi?.credit_score?.needs_help,
+        l2: en?.credit_score?.needs_help
+          ? `(${en?.credit_score?.needs_help})`
+          : '',
+      };
+    } else if (score <= 730) {
+      return {
+        l1: hi?.credit_score?.average,
+        l2: en?.credit_score?.average ? `(${en?.credit_score?.average})` : '',
+      };
+    } else if (score <= 770) {
+      return {
+        l1: hi?.credit_score?.fair,
+        l2: en?.credit_score?.fair ? `(${en?.credit_score?.fair})` : '',
+      };
+    } else if (score <= 790) {
+      return {
+        l1: hi?.credit_score?.good,
+        l2: en?.credit_score?.good ? `(${en?.credit_score?.good})` : '',
+      };
+    } else {
+      return {
+        l1: hi?.credit_score?.excellent,
+        l2: en?.credit_score?.excellent
+          ? `(${en?.credit_score?.excellent})`
+          : '',
+      };
+    }
+  }, [score, hi, en]);
+  useEffect(() => {
+    if (!fillOtp) return;
+
+    const interval = setInterval(() => {
+      setSeconds((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setCanResend(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [resend]);
+  const handleRequestOTP = async () => {
+    if (fillOtp) {
+      if (otp.length >= 6 && otp == '123456') {
+        addToast({
+          type: 'success',
+          hi: hi?.login?.login_success,
+          en: en?.login?.login_success,
+        });
+        setScore(500);
+        setShowCredit(true);
+      } else {
+        addToast({
+          type: 'error',
+          hi: hi?.login?.invalid,
+          en: en?.login?.invalid,
+        });
+        setShowCredit(false);
+      }
+    } else {
+      validteAndSendOtp();
+    }
+  };
+
+  const validteAndSendOtp = () => {
+    if (mobile.length > 10) {
+      addToast({
+        type: 'error',
+        hi: hi?.login?.enter_number,
+        en: en?.login?.enter_number,
+      });
+    } else if (mobile == '7826844889') {
+      addToast({
+        type: 'success',
+        hi: hi?.login?.otp_sent,
+        en: en?.login?.otp_sent,
+      });
+      setFillOtp(true);
+      setCanResend(false);
+      SetResend(!resend);
+    } else {
+      addToast({
+        type: 'error',
+        hi: hi?.login?.invalid_number,
+        en: en?.login?.invalid_number,
+      });
+    }
+  };
+  const mobilbumber = (value: string) => {
+    const numbersOnly = value.replace(/\D/g, '');
+    setMobile(numbersOnly);
+  };
 
   return (
     <Box
@@ -43,7 +147,7 @@ function NominationStepOne() {
     >
       <AppHeader
         showBack
-        onBack={() => router.push('/nomination_form/step-1')}
+        onBack={() => router.push('/nomination_form/step-2')}
         h1={hi?.form?.nomi_form}
         h2={en?.form?.nomi_form}
       />
@@ -69,91 +173,159 @@ function NominationStepOne() {
           <NominationStepper activeStep={2} />
 
           <Title1
-            h1={hi?.form?.enterprise}
-            h2={en?.form?.enterprise}
+            h1={hi?.form?.check_credit}
+            h2={en?.form?.check_credit}
             h1style={{ fontSize: 18, fontWeight: 700 }}
             h2style={{ mb: 2, fontSize: 14 }}
           />
+          <Box>
+            {showCredit ? (
+              <Box>
+                <CreditScoreGauge score={score} label={remark} />
+                <Box sx={{ mt: 2 }}>
+                  <SelectField
+                    label_1={hi?.credit_score?.set_credit_limit}
+                    label_2={en?.credit_score?.set_credit_limit}
+                    placeholder="Set Credit Limit"
+                    value={creditLimit}
+                    onChange={setCreditLimit}
+                    options={[
+                      {
+                        label_1: '50000',
+                        value: '50000',
+                      },
+                      {
+                        label_1: '100000',
+                        value: '100000',
+                      },
+                      {
+                        label_1: '150000',
+                        value: '150000',
+                      },
+                      {
+                        label_1: '200000',
+                        value: '200000',
+                      },
+                      {
+                        label_1: '250000',
+                        value: '250000',
+                      },
+                      {
+                        label_1: '300000',
+                        value: '300000',
+                      },
+                    ]}
+                  />
+                </Box>
+              </Box>
+            ) : (
+              <Box display="flex" flexDirection="column" gap={2}>
+                <Box sx={{ mt: 2 }}>
+                  {fillOtp ? (
+                    <Box>
+                      <MuiOtpInput
+                        value={otp}
+                        onChange={(val) => setOtp(val.replace(/\D/g, ''))}
+                        length={6}
+                        autoFocus
+                        sx={{
+                          gap: 1,
+                          mb: 2,
+                          py: 1,
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 3,
+                            backgroundColor: '#F9FAFB',
+                          },
+                          '& .MuiOutlinedInput-input': {
+                            fontSize: 16,
+                            py: 1.5,
+                          },
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          mb: 2,
+                        }}
+                        onClick={resendOtp}
+                      >
+                        <Title1
+                          h1={`${hi.login.resend}`}
+                          h2={`(${en.login.resend})`}
+                          boxStyle={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: canResend ? 'pointer' : 'not-allowed',
+                          }}
+                          h1style={{
+                            fontSize: 13,
+                            fontWeight: canResend ? 700 : 400,
+                            color: canResend ? '#000' : '#9CA3AF',
+                          }}
+                          h2style={{
+                            pl: 1,
+                            fontSize: 13,
+                            fontWeight: canResend ? 600 : 400,
+                            color: canResend ? '#000' : '#9CA3AF',
+                          }}
+                        />
 
-          <Box display="flex" flexDirection="column" gap={2}>
-            <CheckBoxSingleSelect
-              label_1={hi?.form?.sector_type}
-              label_2={en?.form?.sector_type}
-              value={sector}
-              onChange={setSector}
-              options={[
-                {
-                  label_1: 'कृषि आधारित',
-                  label_2: 'Farm-based',
-                  value: 'farm',
-                },
-                {
-                  label_1: 'गैर-कृषि आधारित',
-                  label_2: 'Non-farm',
-                  value: 'nonfarm',
-                },
-              ]}
-            />
-            <SelectField
-              label_1={hi?.form?.business_type}
-              label_2={en?.form?.business_type}
-              placeholder="Select Farm-based enterprises"
-              value={businessType}
-              onChange={setBusinessType}
-              options={[
-                {
-                  label_1: 'कृषि',
-                  label_2: 'Agriculture',
-                  value: 'agri',
-                },
-                {
-                  label_1: 'डेयरी',
-                  label_2: 'Dairy',
-                  value: 'dairy',
-                },
-                {
-                  label_1: 'बकरी पालन',
-                  label_2: 'Goat rearing',
-                  value: 'goat',
-                },
-              ]}
-            />
+                        {!canResend && (
+                          <Typography
+                            sx={{ ml: 1, fontSize: 13, color: '#9CA3AF' }}
+                          >
+                            {seconds}s
+                          </Typography>
+                        )}
+                      </Box>
+                    </Box>
+                  ) : (
+                    <Box>
+                      <Title1
+                        h1={hi.login.mobile}
+                        h2={en.login.mobile}
+                        h1style={{ fontSize: 18, fontWeight: 600 }}
+                        h2style={{ fontWeight: 300, mb: 2, fontSize: 14 }}
+                      />
+                      <TextField
+                        fullWidth
+                        placeholder="0123456789"
+                        variant="outlined"
+                        sx={{
+                          mb: 3,
+                          '& .MuiOutlinedInput-root': {
+                            borderRadius: 3,
+                            backgroundColor: '#F9FAFB',
+                          },
+                          '& .MuiOutlinedInput-input': {
+                            fontSize: 15,
+                            py: 1.5,
+                          },
+                        }}
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <Typography sx={{ fontSize: 15 }}>+91</Typography>
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => mobilbumber(e.target.value)}
+                      />
+                    </Box>
+                  )}
+                </Box>
 
-            <CheckBoxMultiSelect
-              label_1={hi?.form?.support}
-              label_2={en?.form?.support}
-              value={supportNeeded}
-              onChange={setSupportNeeded}
-              options={[
-                {
-                  label_1: 'बाजार तक पहुंच',
-                  label_2: 'Market Access',
-                  value: 'market',
-                },
-                {
-                  label_1: 'विपणन',
-                  label_2: 'Marketing',
-                  value: 'marketing',
-                },
-                {
-                  label_1: 'मांग का आकलन',
-                  label_2: 'Demand Assessment',
-                  value: 'demand',
-                },
-                {
-                  label_1: 'कोई नहीं',
-                  label_2: 'None',
-                  value: 'none',
-                },
-              ]}
-            />
-
-            <ImportantNote
-              h1={hi.form.important}
-              h2={en.form.important}
-              desc_1={hi.form.final_review_desc}
-              desc_2={en.form.final_review_desc}
-            />
+                <ImportantNote
+                  h1={hi.form.important_credit_check}
+                  h2={en.form.important_credit_check}
+                  desc_1={hi.form.final_review_credit_check}
+                  desc_2={en.form.final_review_credit_check}
+                />
+              </Box>
+            )}
           </Box>
 
           <Button
@@ -167,11 +339,24 @@ function NominationStepOne() {
               textTransform: 'none',
               '&:hover': { bgcolor: '#111' },
             }}
+            onClick={handleRequestOTP}
           >
             <Box textAlign="center">
               <Title1
-                h1={hi?.form?.next_step}
-                h2={en?.form?.next_step}
+                h1={
+                  showCredit
+                    ? hi?.form?.submit_credit
+                    : fillOtp
+                      ? hi.form.submit
+                      : hi.login.otp
+                }
+                h2={
+                  showCredit
+                    ? en?.form?.submit_credit
+                    : fillOtp
+                      ? en.form.submit
+                      : en.login.otp
+                }
                 h1style={{
                   fontWeight: 600,
                   textAlign: 'center',

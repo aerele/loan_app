@@ -33,7 +33,7 @@ function ImportantNote({ h1, h2, desc_1, desc_2 }: Props) {
         />
       </Box>
 
-      <Typography fontSize={12} fontWeight={500} mb={1}>
+      <Typography fontSize={12} fontWeight={700} mb={1}>
         {desc_1}
       </Typography>
 
