@@ -46,7 +46,9 @@
     "final_review_credit_check": "Credit score and risk flags will be fetched automatically after submission for review by checkers.",
     "save_and_next": "Save & Next",
     "submit": "Submit",
-    "submit_credit": "Submit Credit Limit"
+    "submit_credit": "Submit Credit Limit",
+    "nomi_approved": "Nomination Approved!",
+    "approved": "Approve"
   },
 
   "credit_score": {
@@ -60,6 +62,14 @@
     "below": "Below",
     "above": "Above",
     "lang": "In English",
-    "set_credit_limit": "Set Credit Limit "
+    "set_credit_limit": "Set Credit Limit ",
+    "next": "What happens next?",
+    "nomniee_title": "NOMINEE’S INFORMATION"
+  },
+
+  "nomi_form": {
+    "nomniee_title": "NOMINEE’S INFORMATION",
+    "enterprises_title": "ENTERPRISE DETAILS",
+    "credit_bureau": "CREDIT BUREAU ASSESSMENT"
   }
 }
