@@ -6,6 +6,8 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import CircularProgress from '@mui/material/CircularProgress';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useState, useEffect } from 'react';
+import { getNumberChecked, verifyOtpApi as verify_otp } from '@/services/api';
+import Cookies from 'js-cookie';
 import { MuiOtpInput } from 'mui-one-time-password-input';
 import Title1 from '@/components/Titel1';
 import { addToast } from '@/components/error/toastStore';
@@ -51,11 +53,15 @@ function LoginPage() {
   const handleRequestOTP = async () => {
     setLoading(true);
     if (fillOtp) {
-      if (otp.length >= 6 && otp == '123456') {
+      if (otp.length >= 6 && (await verifyOtp(mobile, otp))) {
         addToast({
           type: 'success',
           hi: hi?.login?.login_success,
           en: en?.login?.login_success,
+        });
+        Cookies.set('mobile', mobile, {
+          expires: 7,
+          sameSite: 'strict',
         });
         redirect('/dashboard');
       } else {
@@ -71,14 +77,32 @@ function LoginPage() {
     setLoading(false);
   };
 
-  const validteAndSendOtp = () => {
+  const numberChecked = async (number: string) => {
+    const result = await getNumberChecked(number);
+    if (result?.message) {
+      return result?.message?.status ? true : false;
+    } else {
+      return false;
+    }
+  };
+
+  const verifyOtp = async (number: string, otp: string) => {
+    const result = await verify_otp(number, otp);
+    if (result?.message) {
+      return result?.message?.status ? true : false;
+    } else {
+      return false;
+    }
+  };
+
+  const validteAndSendOtp = async () => {
     if (mobile.length > 10) {
       addToast({
         type: 'error',
         hi: hi?.login?.enter_number,
         en: en?.login?.enter_number,
       });
-    } else if (mobile == '7826844889') {
+    } else if (await numberChecked(mobile)) {
       addToast({
         type: 'success',
         hi: hi?.login?.otp_sent,
