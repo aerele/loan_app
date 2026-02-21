@@ -1,16 +1,8 @@
 'use client';
 
-import {
-  Box,
-  Typography,
-  Button,
-  Stepper,
-  Step,
-  StepLabel,
-  Paper,
-} from '@mui/material';
+import { Box, Button, Paper } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Title1 from '@/components/Titel1';
 import Text from '@/components/FormComponents/Text';
 import hi from '@/messages/hi.json';
@@ -18,11 +10,55 @@ import en from '@/messages/en.json';
 import AppHeader from '@/components/header/Appheader';
 import NominationStepper from '@/components/nomination/NominationStepper';
 
-const steps = ['1', '2', '3'];
+type NominationStep1Form = {
+  name: string;
+  pincode: string;
+  district: string;
+  area: string;
+  permanent_address: string;
+  aadhaar: string;
+  pan: string;
+  dob: string;
+};
 
-function NominationStepOne() {
+const initialForm: NominationStep1Form = {
+  name: '',
+  pincode: '',
+  district: '',
+  area: '',
+  permanent_address: '',
+  aadhaar: '',
+  pan: '',
+  dob: '',
+};
+
+export default function NominationStepOne() {
   const router = useRouter();
-  const [activeStep] = useState(0);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const [form, setForm] = useState<NominationStep1Form>(() => {
+    if (typeof window === 'undefined') return initialForm;
+
+    try {
+      const saved = localStorage.getItem('nomination_step1');
+      return saved ? (JSON.parse(saved) as NominationStep1Form) : initialForm;
+    } catch {
+      return initialForm;
+    }
+  });
+  const handleNext = () => {
+    console.log('STEP-1 FORM DICT:', form);
+
+    localStorage.setItem('nomination_step1', JSON.stringify(form));
+
+    router.push('/nomination_form/step-2');
+  };
 
   return (
     <Box
@@ -40,6 +76,7 @@ function NominationStepOne() {
         h1={hi?.form?.nomi_form}
         h2={en?.form?.nomi_form}
       />
+
       <Box
         sx={{
           flex: 1,
@@ -47,19 +84,12 @@ function NominationStepOne() {
           px: 2,
           py: 2,
           pb: 5,
-          '&::-webkit-scrollbar': {
-            display: 'none',
-          },
+          '&::-webkit-scrollbar': { display: 'none' },
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}
       >
-        <Paper
-          sx={{
-            p: 3,
-            borderRadius: 3,
-          }}
-        >
+        <Paper sx={{ p: 3, borderRadius: 3 }}>
           <NominationStepper activeStep={0} />
 
           <Title1
@@ -71,44 +101,80 @@ function NominationStepOne() {
 
           <Box display="flex" flexDirection="column" gap={2}>
             <Text
+              name="name"
+              value={form.name}
+              onChange={handleChange}
               label_1={hi?.form?.name}
               label_2={en?.form?.name}
               placeholder="As per Aadhaar"
             />
+
             <Text
+              name="pincode"
+              value={form.pincode}
+              onChange={handleChange}
               label_1={hi?.form?.pincode}
               label_2={en?.form?.pincode}
-              placeholder="As per Aadhaar"
+              placeholder="Pincode"
             />
+
             <Text
+              name="district"
+              value={form.district}
+              onChange={handleChange}
               label_1={hi?.form?.dictrict}
               label_2={en?.form?.dictrict}
-              placeholder="As per Aadhaar"
+              placeholder="District"
             />
+
             <Text
+              name="area"
+              value={form.area}
+              onChange={handleChange}
               label_1={hi?.form?.area}
               label_2={en?.form?.area}
-              placeholder="As per Aadhaar"
+              placeholder="Area"
             />
+
             <Text
+              name="permanent_address"
+              value={form.permanent_address}
+              onChange={handleChange}
               label_1={hi?.form?.permanent_address}
               label_2={en?.form?.permanent_address}
               placeholder="Street, Village, Block..."
               multiline
               rows={3}
             />
+
             <Text
+              name="aadhaar"
+              value={form.aadhaar}
+              onChange={handleChange}
               label_1={hi?.form?.adhaar}
               label_2={en?.form?.adhaar}
               placeholder="12-digit number"
             />
+
             <Text
+              name="pan"
+              value={form.pan}
+              onChange={handleChange}
               label_1={hi?.form?.pan}
               label_2={en?.form?.pan}
               placeholder="ABCDE1234F"
             />
-            <Text label_1={hi?.form?.dob} label_2={en?.form?.dob} type="date" />
+
+            <Text
+              name="dob"
+              value={form.dob}
+              onChange={handleChange}
+              label_1={hi?.form?.dob}
+              label_2={en?.form?.dob}
+              type="date"
+            />
           </Box>
+
           <Button
             fullWidth
             variant="contained"
@@ -120,22 +186,14 @@ function NominationStepOne() {
               textTransform: 'none',
               '&:hover': { bgcolor: '#111' },
             }}
-            onClick={() => router.push('/nomination_form/step-2')}
+            onClick={handleNext}
           >
             <Box textAlign="center">
               <Title1
                 h1={hi?.form?.next_step}
                 h2={en?.form?.next_step}
-                h1style={{
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  fontSize: 15,
-                }}
-                h2style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                  textAlign: 'center',
-                }}
+                h1style={{ fontWeight: 600, textAlign: 'center', fontSize: 15 }}
+                h2style={{ fontWeight: 400, fontSize: 12, textAlign: 'center' }}
               />
             </Box>
           </Button>
@@ -144,5 +202,3 @@ function NominationStepOne() {
     </Box>
   );
 }
-
-export default NominationStepOne;

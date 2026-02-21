@@ -4,6 +4,25 @@ import Providers from './providers';
 import ErrorStack from '@/components/error/ErrorStack';
 import en from '@/messages/en.json';
 
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Loan App',
+  description: 'Loan Management App',
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+
+  icons: {
+    icon: [
+      { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/icon-180.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -15,7 +34,6 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <Providers messages={en}>
             <ErrorStack />
-
             {children}
           </Providers>
         </AppRouterCacheProvider>
