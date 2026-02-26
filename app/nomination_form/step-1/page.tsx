@@ -14,21 +14,20 @@ import { validatAadhar, validatPan } from '@/services/api';
 import NominationStepper from '@/components/nomination/NominationStepper';
 import { useNominationForm } from '../NominationFormProvider';
 
-type Step1 = {
-  first_name: string;
-  last_name: string;
-  pincode: string;
-  district: string;
-  area: string;
-  permanent_address: string;
-  aadhaar: string;
-  pan: string;
-  dob: string;
-};
-
 export default function NominationStepOne() {
   const router = useRouter();
   const { form, setStep1 } = useNominationForm();
+  const {
+    first_name,
+    last_name,
+    pincode,
+    district,
+    area,
+    permanent_address,
+    aadhaar,
+    pan,
+    dob,
+  } = form.step1;
 
   const [aadhaarValidated, setAadhaarValidated] = useState(false);
   const [panValidated, setPanValidated] = useState(false);
@@ -42,12 +41,13 @@ export default function NominationStepOne() {
   ) => {
     const { name, value } = e.target;
 
-    const key = name as keyof Step1;
+    if (!(name in form.step1)) return;
+    const key = name as keyof typeof form.step1;
 
     if (key === 'aadhaar') setAadhaarValidated(false);
     if (key === 'pan') setPanValidated(false);
 
-    setStep1({ [key]: value } as Partial<Step1>);
+    setStep1({ [key]: value });
   };
 
   const validateAadhaar = async (): Promise<boolean> => {
@@ -208,16 +208,6 @@ export default function NominationStepOne() {
       setNextLoading(false);
     }
   };
-
-  const canClickNext =
-    !isEmpty(form.step1.first_name) &&
-    !isEmpty(form.step1.last_name) &&
-    !isEmpty(form.step1.pincode) &&
-    !isEmpty(form.step1.aadhaar) &&
-    !isEmpty(form.step1.pan) &&
-    !isEmpty(form.step1.dob) &&
-    !nextLoading;
-
   return (
     <Box
       sx={{
@@ -288,7 +278,6 @@ export default function NominationStepOne() {
               required
             />
 
-            {/* Optional fields ✅ */}
             <Text
               name="district"
               value={form.step1.district}
@@ -366,8 +355,8 @@ export default function NominationStepOne() {
               textTransform: 'none',
               '&:hover': { bgcolor: '#111' },
             }}
-            onClick={handleNext}
-            disabled={!canClickNext}
+            // onClick={handleNext}
+            onClick={() => router.push('/nomination_form/step-2')}
           >
             <Box textAlign="center">
               <Title1

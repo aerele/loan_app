@@ -25,7 +25,6 @@ function NominationStepOne() {
   const [seconds, setSeconds] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [showCredit, setShowCredit] = useState(false);
-  const [creditLimit, setCreditLimit] = useState('');
   const [score, setScore] = useState(800);
 
   const { form, setStep3 } = useNominationForm();
@@ -89,6 +88,8 @@ function NominationStepOne() {
   }, [resend]);
   const handleRequestOTP = async () => {
     if (showCredit) {
+      const okRequired = validateRequired();
+      if (!okRequired) return;
       router.push('/nomination_form/view_status');
     } else if (fillOtp) {
       if (otp.length >= 6 && otp == '123456') {
@@ -110,6 +111,18 @@ function NominationStepOne() {
     } else {
       validteAndSendOtp();
     }
+  };
+
+  const validateRequired = (): boolean => {
+    if (!credit_limit) {
+      addToast({
+        type: 'error',
+        hi: 'कृपया क्रेडिट लिमिट चुनें',
+        en: 'Please select credit limit',
+      });
+      return false;
+    }
+    return true;
   };
 
   const validteAndSendOtp = () => {
