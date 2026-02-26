@@ -21,6 +21,7 @@ export type NominationStep2Form = {
 };
 
 export type NominationStep3Form = {
+  credit_score: string;
   credit_limit: string;
 };
 
@@ -48,6 +49,7 @@ const initialState: NominationFormState = {
     supportNeeded: [],
   },
   step3: {
+    credit_score: '',
     credit_limit: '',
   },
 };

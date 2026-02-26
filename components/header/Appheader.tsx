@@ -12,9 +12,15 @@ import {
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Title1 from '@/components/Titel1';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import {
+  getUserRoles,
+  getUserInfo,
+  clearAllUserCaches,
+} from '@/app/utils/user';
+import { storage } from '@/app/utils/localStorage';
 
 type AppHeaderProps = {
   showBack?: boolean;
@@ -24,6 +30,13 @@ type AppHeaderProps = {
   h1?: string;
   h2?: string;
 };
+
+type UserInfo = {
+  full_name?: string;
+  mobile_no?: string;
+  email?: string;
+  profile?: string;
+} & Record<string, unknown>;
 
 export default function AppHeader({
   showBack = false,
@@ -36,6 +49,8 @@ export default function AppHeader({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const router = useRouter();
+  const [roles, setRoles] = useState<string[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   const handleAvatarClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -49,10 +64,44 @@ export default function AppHeader({
     Object.keys(Cookies.get()).forEach((cookieName) => {
       Cookies.remove(cookieName);
     });
+    clearAllUserCaches();
+    storage.clear();
+    sessionStorage.clear();
 
     handleClose();
     router.push('/login');
   };
+
+  useEffect(() => {
+    const loadRoles = async () => {
+      try {
+        const r = await getUserRoles();
+
+        const allowedRoles = ['SHG', 'VO', 'CLF'];
+
+        const filtered = r.filter((role) => allowedRoles.includes(role));
+
+        setRoles(filtered);
+      } catch (err) {
+        console.error('Failed to load roles', err);
+      }
+    };
+
+    const getUserDetails = async () => {
+      try {
+        const res = await getUserInfo();
+        const message = res[0] as unknown;
+        if (typeof message === 'object' && message !== null) {
+          setUserInfo(message as UserInfo);
+        }
+      } catch (err) {
+        console.log('Failed to load user info', err);
+      }
+    };
+
+    loadRoles();
+    getUserDetails();
+  }, []);
 
   return (
     <Box
@@ -75,7 +124,7 @@ export default function AppHeader({
       {showUser && (
         <>
           <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
-            <Avatar src="/images/user.png" />
+            <Avatar src={userInfo?.profile ?? '/images/user.png'} />
           </IconButton>
 
           <Menu
@@ -121,9 +170,13 @@ export default function AppHeader({
 
           <Box>
             <Typography fontSize={12} color="text.secondary">
-              SHG उपयोगकर्ता
+              {roles.length > 0
+                ? `${roles.join(', ')} उपयोगकर्ता`
+                : 'उपयोगकर्ता'}
             </Typography>
-            <Typography fontWeight={700}>{userName}</Typography>
+            <Typography fontWeight={700}>
+              {userInfo?.full_name ?? 'guest'}
+            </Typography>
           </Box>
         </>
       )}

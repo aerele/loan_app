@@ -8,7 +8,7 @@ export type FrappeRestApiResponse<T> = {
 
 export type CustomApiMessage = {
   status: number;
-  msg: string | unknown[];
+  msg: string | string[];
 };
 
 async function postFrappe<T>(
@@ -29,7 +29,7 @@ async function postFrappe<T>(
   return (await response.json()) as FrappeCustomResponse<T>;
 }
 
-async function getFrappe<T>(url: string): Promise<FrappeRestApiResponse<T>> {
+async function getFrappe<T>(url: string): Promise<FrappeCustomResponse<T>> {
   const response = await fetch(url, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
@@ -40,7 +40,7 @@ async function getFrappe<T>(url: string): Promise<FrappeRestApiResponse<T>> {
     throw new Error(`Request failed (${response.status}): ${text}`);
   }
 
-  return (await response.json()) as FrappeRestApiResponse<T>;
+  return (await response.json()) as FrappeCustomResponse<T>;
 }
 
 export const getNumberChecked = (number: string) => {
@@ -75,5 +75,23 @@ export const validatPan = (pan_number: string) => {
     {
       pan_number: pan_number,
     }
+  );
+};
+
+export const getRoles = () => {
+  return getFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.user.get_roles'
+  );
+};
+
+export const getNominationsform = () => {
+  return getFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.dashboard.get_nomination_list'
+  );
+};
+
+export const getUserDetails = () => {
+  return getFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.user.get_user_info'
   );
 };
