@@ -27,10 +27,16 @@ function CheckBoxMultiSelect({
   const toggleValue = (val: string) => {
     let newValue: string[] = [];
 
-    if (value.includes(val)) {
-      newValue = value.filter((v) => v !== val);
+    if (val === 'none') {
+      newValue = value.includes('none') ? [] : ['none'];
     } else {
-      newValue = [...value, val];
+      const cleaned = value.filter((v) => v !== 'none');
+
+      if (cleaned.includes(val)) {
+        newValue = cleaned.filter((v) => v !== val);
+      } else {
+        newValue = [...cleaned, val];
+      }
     }
 
     onChange?.(newValue);

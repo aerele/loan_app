@@ -75,7 +75,7 @@ export default function AppHeader({
       {showUser && (
         <>
           <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
-            <Avatar src="/user.png" />
+            <Avatar src="/images/user.png" />
           </IconButton>
 
           <Menu

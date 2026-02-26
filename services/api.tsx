@@ -33,8 +33,29 @@ export const getNumberChecked = (number: string) => {
 };
 
 export const verifyOtpApi = (number: string, otp: string) => {
-  return postFrappe<ApiMessage>('/api/method/nomination.api.login.verify_otp', {
-    mobile_no: number,
-    otp,
-  });
+  return postFrappe<ApiMessage>(
+    '/api/method/nomination.api.login.verify_user_otp',
+    {
+      mobile_number: number,
+      otp,
+    }
+  );
+};
+
+export const validatAadhar = (aadhar_number: string) => {
+  return postFrappe<ApiMessage>(
+    '/api/method/nomination.api.form.validate_aadhare',
+    {
+      aadhaar_number: aadhar_number,
+    }
+  );
+};
+
+export const validatPan = (pan_number: string) => {
+  return postFrappe<ApiMessage>(
+    '/api/method/nomination.api.form.validate_pan',
+    {
+      pan_number: pan_number,
+    }
+  );
 };

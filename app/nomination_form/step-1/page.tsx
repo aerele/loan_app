@@ -1,17 +1,22 @@
 'use client';
 
 import { Box, Button, Paper } from '@mui/material';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+
 import Title1 from '@/components/Titel1';
 import Text from '@/components/FormComponents/Text';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
+import { addToast } from '@/components/error/toastStore';
 import AppHeader from '@/components/header/Appheader';
+import { validatAadhar, validatPan } from '@/services/api';
 import NominationStepper from '@/components/nomination/NominationStepper';
+import { useNominationForm } from '../NominationFormProvider';
 
-type NominationStep1Form = {
-  name: string;
+type Step1 = {
+  first_name: string;
+  last_name: string;
   pincode: string;
   district: string;
   area: string;
@@ -21,44 +26,197 @@ type NominationStep1Form = {
   dob: string;
 };
 
-const initialForm: NominationStep1Form = {
-  name: '',
-  pincode: '',
-  district: '',
-  area: '',
-  permanent_address: '',
-  aadhaar: '',
-  pan: '',
-  dob: '',
-};
-
 export default function NominationStepOne() {
   const router = useRouter();
+  const { form, setStep1 } = useNominationForm();
+
+  const [aadhaarValidated, setAadhaarValidated] = useState(false);
+  const [panValidated, setPanValidated] = useState(false);
+
+  const [nextLoading, setNextLoading] = useState(false);
+
+  const isEmpty = (v: unknown) => String(v ?? '').trim().length === 0;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    const key = name as keyof Step1;
+
+    if (key === 'aadhaar') setAadhaarValidated(false);
+    if (key === 'pan') setPanValidated(false);
+
+    setStep1({ [key]: value } as Partial<Step1>);
   };
 
-  const [form, setForm] = useState<NominationStep1Form>(() => {
-    if (typeof window === 'undefined') return initialForm;
+  const validateAadhaar = async (): Promise<boolean> => {
+    try {
+      const aadhaar = (form.step1.aadhaar || '').trim();
+
+      if (!aadhaar) {
+        addToast({
+          type: 'error',
+          hi: 'कृपया आधार नंबर दर्ज करें',
+          en: 'Please enter Aadhaar number',
+        });
+        setAadhaarValidated(false);
+        return false;
+      }
+
+      const res = await validatAadhar(aadhaar);
+      const isValid = Boolean(res?.message?.status);
+
+      setAadhaarValidated(isValid);
+
+      addToast({
+        type: isValid ? 'success' : 'error',
+        hi: isValid ? 'आधार सत्यापन सफल' : 'आधार सत्यापन असफल',
+        en: isValid
+          ? 'Aadhaar validated successfully'
+          : 'Aadhaar validation failed',
+      });
+
+      return isValid;
+    } catch {
+      setAadhaarValidated(false);
+      addToast({
+        type: 'error',
+        hi: 'आधार सत्यापन असफल',
+        en: 'Aadhaar validation failed',
+      });
+      return false;
+    }
+  };
+
+  const validatePan = async (): Promise<boolean> => {
+    try {
+      const pan = (form.step1.pan || '').trim().toUpperCase();
+
+      if (!pan) {
+        addToast({
+          type: 'error',
+          hi: 'कृपया पैन नंबर दर्ज करें',
+          en: 'Please enter PAN number',
+        });
+        setPanValidated(false);
+        return false;
+      }
+
+      const res = await validatPan(pan);
+      const isValid = Boolean(res?.message?.status);
+
+      setPanValidated(isValid);
+
+      addToast({
+        type: isValid ? 'success' : 'error',
+        hi: isValid ? 'पैन सत्यापन सफल' : 'पैन सत्यापन असफल',
+        en: isValid ? 'PAN validated successfully' : 'PAN validation failed',
+      });
+
+      return isValid;
+    } catch {
+      setPanValidated(false);
+      addToast({
+        type: 'error',
+        hi: 'पैन सत्यापन असफल',
+        en: 'PAN validation failed',
+      });
+      return false;
+    }
+  };
+
+  const validateRequired = (): boolean => {
+    if (isEmpty(form.step1.first_name)) {
+      addToast({
+        type: 'error',
+        hi: 'पहला नाम आवश्यक है',
+        en: 'First name is required',
+      });
+      return false;
+    }
+    if (isEmpty(form.step1.last_name)) {
+      addToast({
+        type: 'error',
+        hi: 'अंतिम नाम आवश्यक है',
+        en: 'Last name is required',
+      });
+      return false;
+    }
+    if (isEmpty(form.step1.pincode)) {
+      addToast({
+        type: 'error',
+        hi: 'पिनकोड आवश्यक है',
+        en: 'Pincode is required',
+      });
+      return false;
+    }
+    if (isEmpty(form.step1.aadhaar)) {
+      addToast({
+        type: 'error',
+        hi: 'आधार नंबर आवश्यक है',
+        en: 'Aadhaar is required',
+      });
+      return false;
+    }
+    if (isEmpty(form.step1.pan)) {
+      addToast({
+        type: 'error',
+        hi: 'पैन नंबर आवश्यक है',
+        en: 'PAN is required',
+      });
+      return false;
+    }
+    if (isEmpty(form.step1.dob)) {
+      addToast({
+        type: 'error',
+        hi: 'जन्म तिथि आवश्यक है',
+        en: 'Date of Birth is required',
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = async () => {
+    if (nextLoading) return;
+
+    const okRequired = validateRequired();
+    if (!okRequired) return;
 
     try {
-      const saved = localStorage.getItem('nomination_step1');
-      return saved ? (JSON.parse(saved) as NominationStep1Form) : initialForm;
-    } catch {
-      return initialForm;
+      setNextLoading(true);
+
+      let aOk = aadhaarValidated;
+      let pOk = panValidated;
+
+      if (!aOk) aOk = await validateAadhaar();
+      if (!pOk) pOk = await validatePan();
+
+      if (!aOk || !pOk) {
+        return;
+      }
+
+      addToast({
+        type: 'success',
+        hi: 'पहला चरण सफलतापूर्वक पूरा हुआ',
+        en: 'Step 1 completed successfully',
+      });
+
+      router.push('/nomination_form/step-2');
+    } finally {
+      setNextLoading(false);
     }
-  });
-  const handleNext = () => {
-    console.log('STEP-1 FORM DICT:', form);
-
-    localStorage.setItem('nomination_step1', JSON.stringify(form));
-
-    router.push('/nomination_form/step-2');
   };
+
+  const canClickNext =
+    !isEmpty(form.step1.first_name) &&
+    !isEmpty(form.step1.last_name) &&
+    !isEmpty(form.step1.pincode) &&
+    !isEmpty(form.step1.aadhaar) &&
+    !isEmpty(form.step1.pan) &&
+    !isEmpty(form.step1.dob) &&
+    !nextLoading;
 
   return (
     <Box
@@ -101,26 +259,39 @@ export default function NominationStepOne() {
 
           <Box display="flex" flexDirection="column" gap={2}>
             <Text
-              name="name"
-              value={form.name}
+              name="first_name"
+              value={form.step1.first_name}
               onChange={handleChange}
-              label_1={hi?.form?.name}
-              label_2={en?.form?.name}
+              label_1={hi?.form?.first_name}
+              label_2={en?.form?.first_name}
               placeholder="As per Aadhaar"
+              required
+            />
+
+            <Text
+              name="last_name"
+              value={form.step1.last_name}
+              onChange={handleChange}
+              label_1={hi?.form?.last_name}
+              label_2={en?.form?.last_name}
+              placeholder="As per Aadhaar"
+              required
             />
 
             <Text
               name="pincode"
-              value={form.pincode}
+              value={form.step1.pincode}
               onChange={handleChange}
               label_1={hi?.form?.pincode}
               label_2={en?.form?.pincode}
               placeholder="Pincode"
+              required
             />
 
+            {/* Optional fields ✅ */}
             <Text
               name="district"
-              value={form.district}
+              value={form.step1.district}
               onChange={handleChange}
               label_1={hi?.form?.dictrict}
               label_2={en?.form?.dictrict}
@@ -129,7 +300,7 @@ export default function NominationStepOne() {
 
             <Text
               name="area"
-              value={form.area}
+              value={form.step1.area}
               onChange={handleChange}
               label_1={hi?.form?.area}
               label_2={en?.form?.area}
@@ -138,7 +309,7 @@ export default function NominationStepOne() {
 
             <Text
               name="permanent_address"
-              value={form.permanent_address}
+              value={form.step1.permanent_address}
               onChange={handleChange}
               label_1={hi?.form?.permanent_address}
               label_2={en?.form?.permanent_address}
@@ -149,29 +320,38 @@ export default function NominationStepOne() {
 
             <Text
               name="aadhaar"
-              value={form.aadhaar}
+              value={form.step1.aadhaar}
               onChange={handleChange}
               label_1={hi?.form?.adhaar}
               label_2={en?.form?.adhaar}
               placeholder="12-digit number"
+              required
+              validate
+              validated={aadhaarValidated}
+              onValidateClick={validateAadhaar}
             />
 
             <Text
               name="pan"
-              value={form.pan}
+              value={form.step1.pan}
               onChange={handleChange}
               label_1={hi?.form?.pan}
               label_2={en?.form?.pan}
               placeholder="ABCDE1234F"
+              required
+              validate
+              validated={panValidated}
+              onValidateClick={validatePan}
             />
 
             <Text
               name="dob"
-              value={form.dob}
+              value={form.step1.dob}
               onChange={handleChange}
               label_1={hi?.form?.dob}
               label_2={en?.form?.dob}
               type="date"
+              required
             />
           </Box>
 
@@ -187,6 +367,7 @@ export default function NominationStepOne() {
               '&:hover': { bgcolor: '#111' },
             }}
             onClick={handleNext}
+            disabled={!canClickNext}
           >
             <Box textAlign="center">
               <Title1

@@ -2,7 +2,6 @@
 
 import { Box, Button, Paper } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import Title1 from '@/components/Titel1';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
@@ -12,13 +11,15 @@ import NominationStepper from '@/components/nomination/NominationStepper';
 import SelectField from '@/components/FormComponents/SelectField';
 import CheckBoxMultiSelect from '@/components/FormComponents/CheckBoxMultiSelect';
 import ImportantNote from '@/components/nomination/ImportantNote';
+import { useNominationForm } from '../NominationFormProvider';
 
-function NominationStepOne() {
+type Sector = 'farm' | 'nonfarm';
+
+export default function NominationStepTwoPage() {
   const router = useRouter();
-  const [activeStep] = useState(0);
-  const [sector, setSector] = useState('farm');
-  const [businessType, setBusinessType] = useState('');
-  const [supportNeeded, setSupportNeeded] = useState<string[]>([]);
+  const { form, setStep2 } = useNominationForm();
+
+  const { sector, businessType, supportNeeded } = form.step2;
 
   return (
     <Box
@@ -36,25 +37,19 @@ function NominationStepOne() {
         h1={hi?.form?.nomi_form}
         h2={en?.form?.nomi_form}
       />
+
       <Box
         sx={{
           flex: 1,
           overflowY: 'auto',
           px: 2,
           py: 2,
-          '&::-webkit-scrollbar': {
-            display: 'none',
-          },
+          '&::-webkit-scrollbar': { display: 'none' },
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}
       >
-        <Paper
-          sx={{
-            p: 3,
-            borderRadius: 3,
-          }}
-        >
+        <Paper sx={{ p: 3, borderRadius: 3 }}>
           <NominationStepper activeStep={1} />
 
           <Title1
@@ -69,7 +64,9 @@ function NominationStepOne() {
               label_1={hi?.form?.sector_type}
               label_2={en?.form?.sector_type}
               value={sector}
-              onChange={setSector}
+              onChange={(val) => {
+                setStep2({ sector: val as Sector, businessType: '' });
+              }}
               options={[
                 {
                   label_1: 'कृषि आधारित',
@@ -83,57 +80,65 @@ function NominationStepOne() {
                 },
               ]}
             />
+
             <SelectField
               label_1={hi?.form?.business_type}
               label_2={en?.form?.business_type}
-              placeholder="Select Farm-based enterprises"
+              placeholder={
+                sector === 'farm'
+                  ? 'Select Farm-based enterprises'
+                  : 'Select Non-farm enterprises'
+              }
               value={businessType}
-              onChange={setBusinessType}
-              options={[
-                {
-                  label_1: 'कृषि',
-                  label_2: 'Agriculture',
-                  value: 'agri',
-                },
-                {
-                  label_1: 'डेयरी',
-                  label_2: 'Dairy',
-                  value: 'dairy',
-                },
-                {
-                  label_1: 'बकरी पालन',
-                  label_2: 'Goat rearing',
-                  value: 'goat',
-                },
-              ]}
+              onChange={(val) => setStep2({ businessType: val })}
+              options={
+                sector === 'farm'
+                  ? [
+                      {
+                        label_1: 'कृषि',
+                        label_2: 'Agriculture',
+                        value: 'agri',
+                      },
+                      { label_1: 'डेयरी', label_2: 'Dairy', value: 'dairy' },
+                      {
+                        label_1: 'बकरी पालन',
+                        label_2: 'Goat rearing',
+                        value: 'goat',
+                      },
+                    ]
+                  : [
+                      {
+                        label_1: 'हस्तशिल्प',
+                        label_2: 'Handicraft',
+                        value: 'handicraft',
+                      },
+                      {
+                        label_1: 'सिलाई',
+                        label_2: 'Tailoring',
+                        value: 'tailoring',
+                      },
+                    ]
+              }
             />
 
             <CheckBoxMultiSelect
               label_1={hi?.form?.support}
               label_2={en?.form?.support}
               value={supportNeeded}
-              onChange={setSupportNeeded}
+              onChange={(vals) => setStep2({ supportNeeded: vals })}
               options={[
                 {
                   label_1: 'बाजार तक पहुंच',
                   label_2: 'Market Access',
                   value: 'market',
                 },
-                {
-                  label_1: 'विपणन',
-                  label_2: 'Marketing',
-                  value: 'marketing',
-                },
+                { label_1: 'विपणन', label_2: 'Marketing', value: 'marketing' },
                 {
                   label_1: 'मांग का आकलन',
                   label_2: 'Demand Assessment',
                   value: 'demand',
                 },
-                {
-                  label_1: 'कोई नहीं',
-                  label_2: 'None',
-                  value: 'none',
-                },
+                { label_1: 'कोई नहीं', label_2: 'None', value: 'none' },
               ]}
             />
 
@@ -162,16 +167,8 @@ function NominationStepOne() {
               <Title1
                 h1={hi?.form?.next_step}
                 h2={en?.form?.save_and_next}
-                h1style={{
-                  fontWeight: 600,
-                  textAlign: 'center',
-                  fontSize: 15,
-                }}
-                h2style={{
-                  fontWeight: 400,
-                  fontSize: 12,
-                  textAlign: 'center',
-                }}
+                h1style={{ fontWeight: 600, textAlign: 'center', fontSize: 15 }}
+                h2style={{ fontWeight: 400, fontSize: 12, textAlign: 'center' }}
               />
             </Box>
           </Button>
@@ -180,5 +177,3 @@ function NominationStepOne() {
     </Box>
   );
 }
-
-export default NominationStepOne;

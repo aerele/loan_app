@@ -14,6 +14,7 @@ import NominationStepper from '@/components/nomination/NominationStepper';
 import ImportantNote from '@/components/nomination/ImportantNote';
 import CreditScoreGauge from '@/components/nomination/CreditScoreGauge';
 import SelectField from '@/components/FormComponents/SelectField';
+import { useNominationForm } from '../NominationFormProvider';
 
 function NominationStepOne() {
   const router = useRouter();
@@ -26,6 +27,9 @@ function NominationStepOne() {
   const [showCredit, setShowCredit] = useState(false);
   const [creditLimit, setCreditLimit] = useState('');
   const [score, setScore] = useState(800);
+
+  const { form, setStep3 } = useNominationForm();
+  const { credit_limit } = form.step3;
 
   const resendOtp = () => {
     if (!canResend) return;
@@ -189,8 +193,8 @@ function NominationStepOne() {
                     label_1={hi?.credit_score?.set_credit_limit}
                     label_2={en?.credit_score?.set_credit_limit}
                     placeholder="Set Credit Limit"
-                    value={creditLimit}
-                    onChange={setCreditLimit}
+                    value={credit_limit}
+                    onChange={(val) => setStep3({ credit_limit: val })}
                     options={[
                       {
                         label_1: '50000',
