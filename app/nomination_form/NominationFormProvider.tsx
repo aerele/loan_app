@@ -1,6 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
+import { submitNominationForm } from '@/services/api';
 
 export type NominationStep1Form = {
   first_name: string;
@@ -31,6 +38,10 @@ type NominationFormState = {
   step3: NominationStep3Form;
 };
 
+export type NominationSubmitPayload = NominationStep1Form &
+  NominationStep2Form &
+  NominationStep3Form;
+
 const initialState: NominationFormState = {
   step1: {
     first_name: '',
@@ -54,6 +65,8 @@ const initialState: NominationFormState = {
   },
 };
 
+type SubmitResult = { ok: true } | { ok: false; error: string };
+
 type Ctx = {
   form: NominationFormState;
 
@@ -62,6 +75,8 @@ type Ctx = {
   setStep3: (patch: Partial<NominationStep3Form>) => void;
 
   resetAll: () => void;
+
+  submitForm: () => Promise<SubmitResult>;
 };
 
 const NominationFormContext = createContext<Ctx | null>(null);
@@ -73,22 +88,49 @@ export function NominationFormProvider({
 }) {
   const [form, setForm] = useState<NominationFormState>(initialState);
 
-  const value = useMemo<Ctx>(() => {
-    return {
-      form,
+  const setStep1 = useCallback((patch: Partial<NominationStep1Form>) => {
+    setForm((prev) => ({ ...prev, step1: { ...prev.step1, ...patch } }));
+  }, []);
 
-      setStep1: (patch) =>
-        setForm((prev) => ({ ...prev, step1: { ...prev.step1, ...patch } })),
+  const setStep2 = useCallback((patch: Partial<NominationStep2Form>) => {
+    setForm((prev) => ({ ...prev, step2: { ...prev.step2, ...patch } }));
+  }, []);
 
-      setStep2: (patch) =>
-        setForm((prev) => ({ ...prev, step2: { ...prev.step2, ...patch } })),
+  const setStep3 = useCallback((patch: Partial<NominationStep3Form>) => {
+    setForm((prev) => ({ ...prev, step3: { ...prev.step3, ...patch } }));
+  }, []);
 
-      setStep3: (patch) =>
-        setForm((prev) => ({ ...prev, step3: { ...prev.step3, ...patch } })),
+  const resetAll = useCallback(() => {
+    setForm(initialState);
+  }, []);
 
-      resetAll: () => setForm(initialState),
-    };
+  const submitForm = useCallback(async (): Promise<SubmitResult> => {
+    try {
+      const payload: NominationSubmitPayload = {
+        ...form.step1,
+        ...form.step2,
+        ...form.step3,
+      };
+
+      await submitNominationForm(payload);
+      return { ok: true };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Submit failed';
+      return { ok: false, error: msg };
+    }
   }, [form]);
+
+  const value = useMemo<Ctx>(
+    () => ({
+      form,
+      setStep1,
+      setStep2,
+      setStep3,
+      resetAll,
+      submitForm,
+    }),
+    [form, setStep1, setStep2, setStep3, resetAll, submitForm]
+  );
 
   return (
     <NominationFormContext.Provider value={value}>
@@ -99,9 +141,10 @@ export function NominationFormProvider({
 
 export function useNominationForm() {
   const ctx = useContext(NominationFormContext);
-  if (!ctx)
+  if (!ctx) {
     throw new Error(
       'useNominationForm must be used inside NominationFormProvider'
     );
+  }
   return ctx;
 }

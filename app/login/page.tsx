@@ -14,9 +14,12 @@ import { addToast } from '@/components/error/toastStore';
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import { redirect } from 'next/navigation';
+import InstallPwaDialog from '@/components/pwa/InstallPwaDialog';
 
 function LoginPage() {
   const [loading, setLoading] = useState(false);
+  const [showInstallDialog, setShowInstallDialog] = useState(false);
+  const [canPromptInstall, setCanPromptInstall] = useState(false);
 
   const [mobile, setMobile] = useState('');
   const [fillOtp, setFillOtp] = useState(false);
@@ -41,6 +44,32 @@ function LoginPage() {
 
     return () => clearInterval(interval);
   }, [resend]);
+
+  useEffect(() => {
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if (!isAndroid) return;
+
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (navigator as unknown as { standalone?: boolean }).standalone === true;
+
+    if (isStandalone) return;
+
+    const onBip = (e: Event) => {
+      setCanPromptInstall(true);
+      setShowInstallDialog(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', onBip);
+    const t = window.setTimeout(() => {
+      setShowInstallDialog(true);
+    }, 800);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBip);
+      window.clearTimeout(t);
+    };
+  }, []);
 
   const resendOtp = () => {
     if (!canResend) return;
@@ -320,6 +349,10 @@ function LoginPage() {
           </Button>
         </Paper>
       </Box>
+      <InstallPwaDialog
+        open={showInstallDialog}
+        onClose={() => setShowInstallDialog(false)}
+      />
     </Box>
   );
 }

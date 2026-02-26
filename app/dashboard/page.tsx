@@ -69,6 +69,7 @@ export default function DashboardPage() {
   const [loadingNominations, setLoadingNominations] = useState(false);
   const [nominations, setNominations] = useState<NominationItem[]>([]);
   const [approved, setApproved] = useState<NominationItem[]>([]);
+  const [disableCreation, setDisableCreation] = useState(false);
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -92,6 +93,7 @@ export default function DashboardPage() {
 
         setRoles(r);
         setCanReview(r.includes('CLF') || r.includes('VO'));
+        setDisableCreation(!r.includes('SHG'));
       } catch {}
     })();
 
@@ -196,7 +198,7 @@ export default function DashboardPage() {
       >
         <Box sx={{ p: 2 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <CreateNominationBox />
+            <CreateNominationBox disable={disableCreation} />
 
             <Box sx={{ display: 'flex', gap: 2 }}>
               <StatsButtons

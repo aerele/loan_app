@@ -206,8 +206,8 @@ export default function NominationStepTwoPage() {
               textTransform: 'none',
               '&:hover': { bgcolor: '#111' },
             }}
-            onClick={() => router.push('/nomination_form/step-3')}
-            // onClick={handleNext}
+            // onClick={() => router.push('/nomination_form/step-3')}
+            onClick={handleNext}
           >
             <Box textAlign="center">
               <Title1
