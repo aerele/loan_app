@@ -10,6 +10,12 @@ export type ToastItem = {
 let listeners: ((msgs: ToastItem[]) => void)[] = [];
 let messages: ToastItem[] = [];
 
+let seq = 0;
+function createId(): number {
+  seq = (seq + 1) % 1000;
+  return Date.now() * 1000 + seq;
+}
+
 export function subscribe(fn: (msgs: ToastItem[]) => void) {
   listeners.push(fn);
   fn(messages);
@@ -19,22 +25,22 @@ export function subscribe(fn: (msgs: ToastItem[]) => void) {
   };
 }
 
+function notify() {
+  listeners.forEach((l) => l([...messages]));
+}
+
 export function removeToast(id: number) {
   messages = messages.filter((m) => m.id !== id);
   notify();
 }
 
-function notify() {
-  listeners.forEach((l) => l([...messages]));
-}
-
 export function addToast(item: Omit<ToastItem, 'id'>) {
-  const newItem = { ...item, id: Date.now() };
+  const newItem: ToastItem = { ...item, id: createId() };
+
   messages = [...messages, newItem];
   notify();
 
   setTimeout(() => {
-    messages = messages.filter((m) => m.id !== newItem.id);
-    notify();
+    removeToast(newItem.id);
   }, 3000);
 }

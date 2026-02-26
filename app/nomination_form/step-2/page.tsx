@@ -12,6 +12,7 @@ import SelectField from '@/components/FormComponents/SelectField';
 import CheckBoxMultiSelect from '@/components/FormComponents/CheckBoxMultiSelect';
 import ImportantNote from '@/components/nomination/ImportantNote';
 import { useNominationForm } from '../NominationFormProvider';
+import { addToast } from '@/components/error/toastStore';
 
 type Sector = 'farm' | 'nonfarm';
 
@@ -20,6 +21,50 @@ export default function NominationStepTwoPage() {
   const { form, setStep2 } = useNominationForm();
 
   const { sector, businessType, supportNeeded } = form.step2;
+
+  const validateRequired = (): boolean => {
+    if (!sector) {
+      addToast({
+        type: 'error',
+        hi: 'कृपया सेक्टर चुनें',
+        en: 'Please select sector',
+      });
+      return false;
+    }
+
+    if (!businessType) {
+      addToast({
+        type: 'error',
+        hi: 'कृपया बिज़नेस टाइप चुनें',
+        en: 'Please select business type',
+      });
+      return false;
+    }
+
+    if (!supportNeeded || supportNeeded.length === 0) {
+      addToast({
+        type: 'error',
+        hi: 'कृपया सपोर्ट विकल्प चुनें',
+        en: 'Please select support needed',
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleNext = () => {
+    const ok = validateRequired();
+    if (!ok) return;
+
+    addToast({
+      type: 'success',
+      hi: 'दूसरा चरण सफलतापूर्वक पूरा हुआ',
+      en: 'Step 2 completed successfully',
+    });
+
+    router.push('/nomination_form/step-3');
+  };
 
   return (
     <Box
@@ -161,7 +206,8 @@ export default function NominationStepTwoPage() {
               textTransform: 'none',
               '&:hover': { bgcolor: '#111' },
             }}
-            onClick={() => router.push('/nomination_form/step-3')}
+            // onClick={() => router.push('/nomination_form/step-3')}
+            onClick={handleNext}
           >
             <Box textAlign="center">
               <Title1
