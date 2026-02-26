@@ -27,7 +27,7 @@ function NominationStepOne() {
   const [showCredit, setShowCredit] = useState(false);
   const [score, setScore] = useState(800);
 
-  const { form, setStep3 } = useNominationForm();
+  const { form, setStep3, submitForm } = useNominationForm();
   const { credit_limit } = form.step3;
 
   const resendOtp = () => {
@@ -90,6 +90,19 @@ function NominationStepOne() {
     if (showCredit) {
       const okRequired = validateRequired();
       if (!okRequired) return;
+
+      const res = await submitForm();
+
+      if (!res.ok) {
+        addToast({
+          type: 'error',
+          hi: 'फॉर्म सबमिट नहीं हुआ',
+          en: `Submit failed: ${res.error}`,
+        });
+        return;
+      }
+
+      router.push('/nomination_form/view_status');
       router.push('/nomination_form/view_status');
     } else if (fillOtp) {
       if (otp.length >= 6 && otp == '123456') {

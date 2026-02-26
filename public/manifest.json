@@ -1,7 +1,7 @@
 {
-  "name": "Loan App",
-  "short_name": "LoanApp",
-  "description": "SHG Loan Application",
+  "name": "JOSH Nomination App",
+  "short_name": "JOSH App",
+  "description": "JOSH Nomination App For Woman Welfare",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#F3F4F6",

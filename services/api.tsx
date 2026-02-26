@@ -1,3 +1,5 @@
+import { NominationSubmitPayload } from '@/app/nomination_form/NominationFormProvider';
+
 export type FrappeCustomResponse<T> = {
   message: T;
 };
@@ -62,7 +64,7 @@ export const verifyOtpApi = (number: string, otp: string) => {
 
 export const validatAadhar = (aadhar_number: string) => {
   return postFrappe<CustomApiMessage>(
-    '/api/method/nomination.api.form.validate_aadhare',
+    '/api/method/nomination.api.form.validate_aadhaar',
     {
       aadhaar_number: aadhar_number,
     }
@@ -93,5 +95,12 @@ export const getNominationsform = () => {
 export const getUserDetails = () => {
   return getFrappe<CustomApiMessage>(
     '/api/method/nomination.api.user.get_user_info'
+  );
+};
+
+export const submitNominationForm = (payload: NominationSubmitPayload) => {
+  return postFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.form.submit_nomination',
+    { payload: payload }
   );
 };
