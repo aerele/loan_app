@@ -25,7 +25,8 @@
 
   "form": {
     "nomi_details": "नामांकित दीदी का विवरण",
-    "name": "पूरा नाम",
+    "first_name": "पहला नाम",
+    "last_name": "अंतिम नाम",
     "pincode": "पिन कोड",
     "dictrict": "ज़िला",
     "area": "शहर / गाँव",

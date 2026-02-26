@@ -25,7 +25,8 @@
 
   "form": {
     "nomi_details": "Nominee Details",
-    "name": "Full Name ",
+    "first_name": "First Name",
+    "last_name": "Last Name ",
     "pincode": "Pincode",
     "dictrict": "District",
     "area": "Town/ Village",
