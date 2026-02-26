@@ -1,7 +1,7 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AppHeader from '@/components/header/Appheader';
 import CreateNominationBox from '@/components/nomination/CreateNominationBox';
 import StatsButtons from '@/components/nomination/StatsButtons';
@@ -11,15 +11,64 @@ import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ApprovedCard from '@/components/nomination/ApprovedCard';
-function DashboardPage() {
-  const [show, setShow] = useState({
+import { getUserRoles } from '../utils/user';
+import { addToast } from '@/components/error/toastStore';
+import { getNominationsform } from '@/services/api';
+
+type ShowState = {
+  submitted: boolean;
+  training: boolean;
+};
+
+type NominationItem = {
+  name: string;
+  id: string;
+  amount: number;
+  type: string;
+};
+
+const isRecord = (v: unknown): v is Record<string, unknown> =>
+  typeof v === 'object' && v !== null;
+
+const toNominationItem = (v: unknown): NominationItem | null => {
+  if (!isRecord(v)) return null;
+
+  const name = typeof v.name === 'string' ? v.name : '';
+  const id = typeof v.id === 'string' ? v.id : '';
+  const amount =
+    typeof v.amount === 'number'
+      ? v.amount
+      : typeof v.amount === 'string'
+        ? Number(v.amount)
+        : 0;
+  const type = typeof v.type === 'string' ? v.type : '';
+
+  if (!id) return null;
+
+  return {
+    name,
+    id,
+    amount: Number.isFinite(amount) ? amount : 0,
+    type,
+  };
+};
+
+export default function DashboardPage() {
+  const [show, setShow] = useState<ShowState>({
     submitted: true,
     training: false,
   });
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  const [roles, setRoles] = useState<string[]>([]);
   const [canReview, setCanReview] = useState(false);
+
   const [showPending, setShowPending] = useState(true);
+
+  const [loadingNominations, setLoadingNominations] = useState(false);
+  const [nominations, setNominations] = useState<NominationItem[]>([]);
+  const [approved, setApproved] = useState<NominationItem[]>([]);
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -33,45 +82,73 @@ function DashboardPage() {
     return () => container.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        const r = await getUserRoles();
+        if (!mounted) return;
+
+        setRoles(r);
+        setCanReview(r.includes('CLF') || r.includes('VO'));
+      } catch {}
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      try {
+        setLoadingNominations(true);
+
+        const res = await getNominationsform();
+        const msg = res.message.msg;
+
+        const items: NominationItem[] = Array.isArray(msg)
+          ? msg
+              .map((x) => toNominationItem(x))
+              .filter((x): x is NominationItem => x !== null)
+          : [];
+
+        if (!mounted) return;
+
+        setNominations(items);
+        setApproved([]);
+      } catch {
+        addToast({
+          type: 'error',
+          hi: 'नामांकन लोड नहीं हो पाया',
+          en: 'Failed to load nominations',
+        });
+      } finally {
+        if (mounted) setLoadingNominations(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const scrollToTop = () => {
-    scrollRef.current?.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const [nominations] = useState([
-    { name: 'Ravi', id: 'ID-001', amount: 5000, type: 'Type 1' },
-    { name: 'Meena', id: 'ID-002', amount: 12000, type: 'Type 1' },
-    { name: 'Kumar', id: 'ID-003', amount: 8000, type: 'Type 1' },
-    { name: 'Anjali', id: 'ID-004', amount: 15000, type: 'Type 1' },
-    { name: 'Vikram', id: 'ID-005', amount: 2500, type: 'Type 1' },
-    { name: 'Sonia', id: 'ID-006', amount: 9500, type: 'Type 1' },
-    { name: 'Rahul', id: 'ID-007', amount: 4200, type: 'Type 1' },
-    { name: 'Priya', id: 'ID-008', amount: 11000, type: 'Type 1' },
-    { name: 'Arjun', id: 'ID-009', amount: 7000, type: 'Type 1' },
-    { name: 'Neha', id: 'ID-010', amount: 13500, type: 'Type 1' },
-  ]);
-
-  const [approved] = useState([
-    { name: 'Ravi', id: 'ID-001', amount: 5000, type: 'Type 1' },
-    { name: 'Meena', id: 'ID-002', amount: 12000, type: 'Type 1' },
-    { name: 'Kumar', id: 'ID-003', amount: 8000, type: 'Type 1' },
-    { name: 'Anjali', id: 'ID-004', amount: 15000, type: 'Type 1' },
-    { name: 'Vikram', id: 'ID-005', amount: 2500, type: 'Type 1' },
-    { name: 'Sonia', id: 'ID-006', amount: 9500, type: 'Type 1' },
-    { name: 'Rahul', id: 'ID-007', amount: 4200, type: 'Type 1' },
-    { name: 'Priya', id: 'ID-008', amount: 11000, type: 'Type 1' },
-    { name: 'Arjun', id: 'ID-009', amount: 7000, type: 'Type 1' },
-    { name: 'Neha', id: 'ID-010', amount: 13500, type: 'Type 1' },
-  ]);
   const handleStatsChange = (type: 'submitted' | 'training') => {
     setShow({
       submitted: type === 'submitted',
       training: type === 'training',
     });
 
-    setShowPending(type === 'submitted' ? true : false);
+    setShowPending(type === 'submitted');
   };
 
   const NoData = (
@@ -104,7 +181,7 @@ function DashboardPage() {
       }}
     >
       <Box sx={{ flexShrink: 0 }}>
-        <AppHeader showUser userName={'स्वाति दीक्षित'} />
+        <AppHeader showUser userName="स्वाति दीक्षित" />
       </Box>
 
       <Box
@@ -112,10 +189,7 @@ function DashboardPage() {
         sx={{
           flexGrow: 1,
           overflow: 'auto',
-          '&::-webkit-scrollbar': {
-            width: 0,
-            display: 'none',
-          },
+          '&::-webkit-scrollbar': { width: 0, display: 'none' },
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}
@@ -128,7 +202,7 @@ function DashboardPage() {
               <StatsButtons
                 h1={hi.dashboard.submitted_nominatio}
                 h2={en.dashboard.submitted_nominatio}
-                count={12}
+                count={nominations.length}
                 show={show.submitted}
                 onClick={() => handleStatsChange('submitted')}
               />
@@ -136,34 +210,61 @@ function DashboardPage() {
               <StatsButtons
                 h1={hi.dashboard.training}
                 h2={en.dashboard.training}
-                count={32}
+                count={approved.length}
                 show={show.training}
                 onClick={() => handleStatsChange('training')}
               />
             </Box>
-
-            {showPending
-              ? nominations.length > 0
-                ? nominations.map((item) => (
-                    <NominationCard
-                      key={item.id}
-                      data={item}
-                      canReview={canReview}
-                    />
-                  ))
-                : NoData
-              : approved.length > 0
-                ? nominations.map((item) => (
-                    <ApprovedCard
-                      key={item.id}
-                      data={item}
-                      canReview={canReview}
-                    />
-                  ))
-                : NoData}
+            {loadingNominations ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  py: 6,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '50%',
+                    border: '4px solid #E5E7EB',
+                    borderTopColor: '#111111',
+                    animation: 'spin 1s linear infinite',
+                  }}
+                />
+                <style jsx>{`
+                  @keyframes spin {
+                    to {
+                      transform: rotate(360deg);
+                    }
+                  }
+                `}</style>
+              </Box>
+            ) : showPending ? (
+              nominations.length > 0 ? (
+                nominations.map((item) => (
+                  <NominationCard
+                    key={item.id}
+                    data={item}
+                    canReview={canReview}
+                  />
+                ))
+              ) : (
+                NoData
+              )
+            ) : approved.length > 0 ? (
+              approved.map((item) => (
+                <ApprovedCard key={item.id} data={item} canReview={canReview} />
+              ))
+            ) : (
+              NoData
+            )}
           </Box>
         </Box>
       </Box>
+
       {showScrollTop && (
         <Box
           onClick={scrollToTop}
@@ -183,9 +284,7 @@ function DashboardPage() {
             zIndex: 1000,
             boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
             transition: '0.2s',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-            },
+            '&:hover': { transform: 'translateY(-2px)' },
           }}
         >
           <ArrowDropUpIcon sx={{ fontSize: 32 }} />
@@ -194,5 +293,3 @@ function DashboardPage() {
     </Box>
   );
 }
-
-export default DashboardPage;
