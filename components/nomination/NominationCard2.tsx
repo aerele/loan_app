@@ -9,7 +9,38 @@ type cardValue = {
   data: NominationData;
 };
 
+const s = (v: unknown, fallback = ''): string =>
+  typeof v === 'string' ? v : fallback;
+
+const pickApproval = (fv: NominationData) => {
+  const voOn = s(fv.vo_approved_on);
+
+  const clfOn = s(fv.clf_approved_on);
+
+  if (voOn) return { on: voOn, level: 'VO' as const };
+  if (clfOn) return { on: clfOn, level: 'CLF' as const };
+
+  return { on: '', level: 'NONE' as const };
+};
+const formatApprovalDateTime = (dateTimeStr: string): string => {
+  const iso = dateTimeStr.replace(' ', 'T');
+  const dt = new Date(iso);
+  if (Number.isNaN(dt.getTime())) return dateTimeStr;
+
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(dt);
+};
 function NominationCard2({ data }: cardValue) {
+  const firstName = s(data.first_name);
+  const lastName = s(data.last_name);
+  const fullName = `${firstName} ${lastName}`.trim() || 'guest';
+  const approval = pickApproval(data);
+  const approvedOn = approval.on ? formatApprovalDateTime(approval.on) : '';
   return (
     <Paper
       elevation={2}
@@ -26,11 +57,9 @@ function NominationCard2({ data }: cardValue) {
         <CheckCircleSharpIcon sx={{ fontSize: 30, color: '#A1A2A1' }} />
 
         <Box>
-          <Typography fontWeight={600}>
-            {typeof data.full_name === 'string' ? data.full_name : ''}
-          </Typography>
+          <Typography fontWeight={600}>{fullName}</Typography>
           <Typography fontSize={12} color="#6B7280">
-            05 Jan 2024 • ₹
+            {approvedOn} • ₹
             {(() => {
               const value = data.set_credit_limit;
 

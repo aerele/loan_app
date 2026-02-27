@@ -8,7 +8,9 @@ import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import Title1 from '@/components/Titel1';
 import SelectField from '@/components/FormComponents/SelectField';
-import { getDoc } from '@/services/api';
+import { getDoc, approveDoc } from '@/services/api';
+import { addToast } from '../error/toastStore';
+import CircularProgress from '@mui/material/CircularProgress';
 
 type FormValues = Record<string, unknown>;
 
@@ -106,6 +108,7 @@ export default function ViewFormContent({ view, name }: FormControlProps) {
 
   const [creditLimit, setCreditLimit] = useState('');
   const [formValues, setFormValues] = useState<FormValues | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!name) return;
@@ -127,6 +130,38 @@ export default function ViewFormContent({ view, name }: FormControlProps) {
 
     getFormData();
   }, [name]);
+
+  const handleApprove = async () => {
+    if (!name) return;
+    try {
+      setLoading(true);
+
+      const res = await approveDoc(name, creditLimit);
+
+      const payload = res?.message ?? res;
+
+      if (payload?.status === 1) {
+        addToast({
+          type: 'success',
+          hi: 'दस्तावेज़ सफलतापूर्वक अगले स्तर पर भेज दिया गया',
+          en: 'Document moved to next workflow state',
+        });
+        router.push(
+          `/nomination_form/view_status?name=${encodeURIComponent(name)}`
+        );
+      } else {
+        addToast({
+          type: 'error',
+          hi: 'स्वीकृति असफल रही',
+          en: 'Approval failed',
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const firstName = s(formValues?.first_name);
   const lastName = s(formValues?.last_name);
@@ -348,22 +383,21 @@ export default function ViewFormContent({ view, name }: FormControlProps) {
           <Button
             fullWidth
             variant="contained"
+            disabled={loading}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleApprove();
+            }}
             sx={{
-              mt: 1,
-              py: 1.5,
-              borderRadius: 3,
-              bgcolor: '#000',
-              textTransform: 'none',
+              backgroundColor: '#000',
+              color: '#fff',
             }}
           >
-            <Box textAlign="center">
-              <Title1
-                h1={s(hi?.form?.approved)}
-                h2={s(en?.form?.approved)}
-                h1style={{ fontWeight: 600, fontSize: '0.8rem' }}
-                h2style={{ fontWeight: 400, fontSize: '0.7rem' }}
-              />
-            </Box>
+            {loading ? (
+              <CircularProgress size={18} sx={{ color: '#fff' }} />
+            ) : (
+              'Approve'
+            )}
           </Button>
         )}
       </Box>

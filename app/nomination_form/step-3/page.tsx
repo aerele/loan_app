@@ -103,7 +103,6 @@ function NominationStepOne() {
       }
 
       router.push('/nomination_form/view_status');
-      router.push('/nomination_form/view_status');
     } else if (fillOtp) {
       if (otp.length >= 6 && otp == '123456') {
         addToast({
