@@ -2,15 +2,19 @@
 
 import { Box } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
+
 import AppHeader from '@/components/header/Appheader';
 import CreateNominationBox from '@/components/nomination/CreateNominationBox';
 import StatsButtons from '@/components/nomination/StatsButtons';
 import NominationCard from '@/components/nomination/NominationCard';
+import ApprovedCard from '@/components/nomination/ApprovedCard';
 import Title1 from '@/components/Titel1';
+
 import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
+
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
-import ApprovedCard from '@/components/nomination/ApprovedCard';
+
 import { getUserRoles } from '../utils/user';
 import { addToast } from '@/components/error/toastStore';
 import { getNominationsform } from '@/services/api';
@@ -20,37 +24,29 @@ type ShowState = {
   training: boolean;
 };
 
-type NominationItem = {
-  name: string;
-  id: string;
-  amount: number;
-  type: string;
+type NominationItem = Record<string, unknown>;
+
+type NominationBuckets = {
+  submitted?: unknown[];
+  ready_for_training?: unknown[];
 };
 
 const isRecord = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null;
 
-const toNominationItem = (v: unknown): NominationItem | null => {
-  if (!isRecord(v)) return null;
+const isNominationBuckets = (v: unknown): v is NominationBuckets => {
+  if (typeof v !== 'object' || v === null) return false;
 
-  const name = typeof v.name === 'string' ? v.name : '';
-  const id = typeof v.id === 'string' ? v.id : '';
-  const amount =
-    typeof v.amount === 'number'
-      ? v.amount
-      : typeof v.amount === 'string'
-        ? Number(v.amount)
-        : 0;
-  const type = typeof v.type === 'string' ? v.type : '';
+  const obj = v as Record<string, unknown>;
 
-  if (!id) return null;
+  const submittedOk =
+    obj.submitted === undefined || Array.isArray(obj.submitted);
 
-  return {
-    name,
-    id,
-    amount: Number.isFinite(amount) ? amount : 0,
-    type,
-  };
+  const readyOk =
+    obj.ready_for_training === undefined ||
+    Array.isArray(obj.ready_for_training);
+
+  return submittedOk && readyOk;
 };
 
 export default function DashboardPage() {
@@ -58,18 +54,18 @@ export default function DashboardPage() {
     submitted: true,
     training: false,
   });
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  const [roles, setRoles] = useState<string[]>([]);
   const [canReview, setCanReview] = useState(false);
+  const [disableCreation, setDisableCreation] = useState(false);
 
   const [showPending, setShowPending] = useState(true);
 
   const [loadingNominations, setLoadingNominations] = useState(false);
   const [nominations, setNominations] = useState<NominationItem[]>([]);
   const [approved, setApproved] = useState<NominationItem[]>([]);
-  const [disableCreation, setDisableCreation] = useState(false);
 
   useEffect(() => {
     const container = scrollRef.current;
@@ -91,7 +87,6 @@ export default function DashboardPage() {
         const r = await getUserRoles();
         if (!mounted) return;
 
-        setRoles(r);
         setCanReview(r.includes('CLF') || r.includes('VO'));
         setDisableCreation(!r.includes('SHG'));
       } catch {}
@@ -110,18 +105,31 @@ export default function DashboardPage() {
         setLoadingNominations(true);
 
         const res = await getNominationsform();
-        const msg = res.message.msg;
+        const msg: unknown = res.message.msg;
 
-        const items: NominationItem[] = Array.isArray(msg)
-          ? msg
-              .map((x) => toNominationItem(x))
-              .filter((x): x is NominationItem => x !== null)
+        const first: NominationBuckets | undefined =
+          Array.isArray(msg) && isNominationBuckets(msg[0])
+            ? msg[0]
+            : undefined;
+
+        if (!first) {
+          setNominations([]);
+          setApproved([]);
+          return;
+        }
+
+        const submittedItems = Array.isArray(first?.submitted)
+          ? first.submitted.filter(isRecord)
+          : [];
+
+        const readyItems = Array.isArray(first?.ready_for_training)
+          ? first.ready_for_training.filter(isRecord)
           : [];
 
         if (!mounted) return;
 
-        setNominations(items);
-        setApproved([]);
+        setNominations(submittedItems);
+        setApproved(readyItems);
       } catch {
         addToast({
           type: 'error',
@@ -217,6 +225,7 @@ export default function DashboardPage() {
                 onClick={() => handleStatsChange('training')}
               />
             </Box>
+
             {loadingNominations ? (
               <Box
                 sx={{
@@ -248,7 +257,7 @@ export default function DashboardPage() {
               nominations.length > 0 ? (
                 nominations.map((item) => (
                   <NominationCard
-                    key={item.id}
+                    key={item.name as string}
                     data={item}
                     canReview={canReview}
                   />
@@ -258,7 +267,11 @@ export default function DashboardPage() {
               )
             ) : approved.length > 0 ? (
               approved.map((item) => (
-                <ApprovedCard key={item.id} data={item} canReview={canReview} />
+                <ApprovedCard
+                  key={item.name as string}
+                  data={item}
+                  canReview={canReview}
+                />
               ))
             ) : (
               NoData
