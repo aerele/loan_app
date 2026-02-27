@@ -8,6 +8,17 @@ export type FrappeRestApiResponse<T> = {
   data: T;
 };
 
+export type CreditScorePayload = {
+  first_name: string;
+  last_name: string;
+  dob: string;
+  pan_number: string;
+  mobile_number: string;
+  district?: string;
+  state_code?: string;
+  pincode?: string;
+};
+
 export type CustomApiMessage = {
   status: number;
   msg: string | string[];
@@ -45,19 +56,27 @@ async function getFrappe<T>(url: string): Promise<FrappeCustomResponse<T>> {
   return (await response.json()) as FrappeCustomResponse<T>;
 }
 
-export const getNumberChecked = (number: string) => {
+export const getNumberChecked = (
+  number: string,
+  credit_check: boolean = false
+) => {
   return postFrappe<CustomApiMessage>(
     '/api/method/nomination.api.login.user_validation',
-    { mobile_number: number }
+    { mobile_number: number, credit_check: credit_check }
   );
 };
 
-export const verifyOtpApi = (number: string, otp: string) => {
+export const verifyOtpApi = (
+  number: string,
+  otp: string,
+  credit_check: boolean = false
+) => {
   return postFrappe<CustomApiMessage>(
     '/api/method/nomination.api.login.verify_user_otp',
     {
       mobile_number: number,
       otp,
+      credit_check: credit_check,
     }
   );
 };
@@ -76,6 +95,15 @@ export const validatPan = (pan_number: string) => {
     '/api/method/nomination.api.form.validate_pan',
     {
       pan_number: pan_number,
+    }
+  );
+};
+
+export const validatDob = (dob: string) => {
+  return postFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.form.validate_dob',
+    {
+      dob: dob,
     }
   );
 };
@@ -121,5 +149,12 @@ export const approveDoc = (name: string, credit_limit: string) => {
       name: name,
       credit_limit: credit_limit,
     }
+  );
+};
+
+export const getCreditScoree = (payload: CreditScorePayload) => {
+  return postFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.credit_check.credit_score',
+    payload
   );
 };

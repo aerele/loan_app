@@ -14,13 +14,61 @@ import ImportantNote from '@/components/nomination/ImportantNote';
 import { useNominationForm } from '../NominationFormProvider';
 import { addToast } from '@/components/error/toastStore';
 
-type Sector = 'farm' | 'nonfarm';
+type Sector = 'farm_based' | 'non_farm';
 
 export default function NominationStepTwoPage() {
   const router = useRouter();
   const { form, setStep2 } = useNominationForm();
 
-  const { sector, businessType, supportNeeded } = form.step2;
+  const { sector, business_category, supportNeeded } = form.step2;
+
+  const farmSelectOptions = [
+    { label_1: 'कृषि', label_2: 'Agriculture', value: 'agriculture' },
+    { label_1: 'डेयरी', label_2: 'Dairy', value: 'dairy' },
+    { label_1: 'बकरी पालन', label_2: 'Goat rearing', value: 'goat_rearing' },
+    {
+      label_1: 'मुर्गी पालन',
+      label_2: 'Poultry farming',
+      value: 'poultry_farming',
+    },
+    {
+      label_1: 'मशरूम उत्पादन',
+      label_2: 'Mushroom cultivation',
+      value: 'mushroom_cultivation',
+    },
+    {
+      label_1: 'कृषि इनपुट दुकान',
+      label_2: 'Agri input shop',
+      value: 'agri_input_shop',
+    },
+  ];
+  const nonFarmSelectOptions = [
+    {
+      label_1: 'हस्तशिल्प',
+      label_2: 'Handicraft',
+      value: 'handicraft',
+    },
+    {
+      label_1: 'सिलाई',
+      label_2: 'Tailoring',
+      value: 'tailoring',
+    },
+    {
+      label_1: 'ब्यूटी पार्लर',
+      label_2: 'Beauty Parlour',
+      value: 'beauty_parlour',
+    },
+    {
+      label_1: 'किराना दुकान',
+      label_2: 'Grocery Store',
+      value: 'grocery_store',
+    },
+    {
+      label_1: 'सब्जी विक्रेता',
+      label_2: 'Vegetable Vendor',
+      value: 'vegetable_vendor',
+    },
+  ];
 
   const validateRequired = (): boolean => {
     if (!sector) {
@@ -32,7 +80,7 @@ export default function NominationStepTwoPage() {
       return false;
     }
 
-    if (!businessType) {
+    if (!business_category) {
       addToast({
         type: 'error',
         hi: 'कृपया बिज़नेस टाइप चुनें',
@@ -110,18 +158,18 @@ export default function NominationStepTwoPage() {
               label_2={en?.form?.sector_type}
               value={sector}
               onChange={(val) => {
-                setStep2({ sector: val as Sector, businessType: '' });
+                setStep2({ sector: val as Sector, business_category: '' });
               }}
               options={[
                 {
                   label_1: 'कृषि आधारित',
                   label_2: 'Farm-based',
-                  value: 'farm',
+                  value: 'farm_based',
                 },
                 {
                   label_1: 'गैर-कृषि आधारित',
                   label_2: 'Non-farm',
-                  value: 'nonfarm',
+                  value: 'non_farm',
                 },
               ]}
             />
@@ -130,39 +178,16 @@ export default function NominationStepTwoPage() {
               label_1={hi?.form?.business_type}
               label_2={en?.form?.business_type}
               placeholder={
-                sector === 'farm'
+                sector === 'farm_based'
                   ? 'Select Farm-based enterprises'
                   : 'Select Non-farm enterprises'
               }
-              value={businessType}
-              onChange={(val) => setStep2({ businessType: val })}
+              value={business_category}
+              onChange={(val) => setStep2({ business_category: val })}
               options={
-                sector === 'farm'
-                  ? [
-                      {
-                        label_1: 'कृषि',
-                        label_2: 'Agriculture',
-                        value: 'agri',
-                      },
-                      { label_1: 'डेयरी', label_2: 'Dairy', value: 'dairy' },
-                      {
-                        label_1: 'बकरी पालन',
-                        label_2: 'Goat rearing',
-                        value: 'goat',
-                      },
-                    ]
-                  : [
-                      {
-                        label_1: 'हस्तशिल्प',
-                        label_2: 'Handicraft',
-                        value: 'handicraft',
-                      },
-                      {
-                        label_1: 'सिलाई',
-                        label_2: 'Tailoring',
-                        value: 'tailoring',
-                      },
-                    ]
+                sector === 'farm_based'
+                  ? farmSelectOptions
+                  : nonFarmSelectOptions
               }
             />
 
@@ -175,13 +200,13 @@ export default function NominationStepTwoPage() {
                 {
                   label_1: 'बाजार तक पहुंच',
                   label_2: 'Market Access',
-                  value: 'market',
+                  value: 'market_access',
                 },
                 { label_1: 'विपणन', label_2: 'Marketing', value: 'marketing' },
                 {
                   label_1: 'मांग का आकलन',
                   label_2: 'Demand Assessment',
-                  value: 'demand',
+                  value: 'demand_assessment',
                 },
                 { label_1: 'कोई नहीं', label_2: 'None', value: 'none' },
               ]}

@@ -15,6 +15,11 @@ import ImportantNote from '@/components/nomination/ImportantNote';
 import CreditScoreGauge from '@/components/nomination/CreditScoreGauge';
 import SelectField from '@/components/FormComponents/SelectField';
 import { useNominationForm } from '../NominationFormProvider';
+import {
+  getNumberChecked,
+  verifyOtpApi as verify_otp,
+  getCreditScoree,
+} from '@/services/api';
 
 function NominationStepOne() {
   const router = useRouter();
@@ -28,7 +33,23 @@ function NominationStepOne() {
   const [score, setScore] = useState(800);
 
   const { form, setStep3, submitForm } = useNominationForm();
-  const { credit_limit } = form.step3;
+  const { set_credit_limit, mobile_number, credit_score } = form.step3;
+  const {
+    first_name,
+    last_name,
+    pincode,
+    district,
+    pan_number,
+    date_of_birth,
+  } = form.step1;
+  const verifyOtp = async (number: string, otp: string) => {
+    const result = await verify_otp(number, otp, true);
+    if (result?.message) {
+      return result?.message?.status ? true : false;
+    } else {
+      return false;
+    }
+  };
 
   const resendOtp = () => {
     if (!canResend) return;
@@ -104,29 +125,83 @@ function NominationStepOne() {
 
       router.push('/nomination_form/view_status');
     } else if (fillOtp) {
-      if (otp.length >= 6 && otp == '123456') {
-        addToast({
-          type: 'success',
-          hi: hi?.login?.login_success,
-          en: en?.login?.login_success,
-        });
-        setScore(500);
-        setShowCredit(true);
+      if (fillOtp) {
+        if (otp.length >= 6 && (await verifyOtp(mobile, otp))) {
+          addToast({
+            type: 'success',
+            hi: 'ओटीपी सफलतापूर्वक सत्यापित हुआ',
+            en: 'OTP verified successfully',
+          });
+
+          try {
+            const res = await getCreditScoree({
+              first_name: form.step1.first_name,
+              last_name: form.step1.last_name,
+              dob: form.step1.date_of_birth,
+              pan_number: form.step1.pan_number,
+              mobile_number: mobile,
+              pincode: form.step1.pincode,
+            });
+
+            if (res?.message?.status === 1) {
+              const score = Number(res.message.msg);
+              setScore(Number.isFinite(score) ? score : 0);
+              setStep3({ mobile_number: mobile });
+              setStep3({ credit_score: score.toString() });
+              addToast({
+                type: 'success',
+                hi: 'क्रेडिट स्कोर प्राप्त हुआ',
+                en: 'Credit score fetched successfully',
+              });
+            } else {
+              addToast({
+                type: 'error',
+                hi: 'क्रेडिट स्कोर प्राप्त नहीं हुआ',
+                en:
+                  typeof res?.message?.msg === 'string'
+                    ? res.message.msg
+                    : 'Failed to fetch credit score',
+              });
+
+              setScore(0);
+            }
+          } catch (err) {
+            console.error(err);
+            addToast({
+              type: 'error',
+              hi: 'क्रेडिट स्कोर त्रुटि',
+              en: 'Credit score error',
+            });
+            setScore(0);
+          }
+
+          setShowCredit(true);
+        } else {
+          addToast({
+            type: 'error',
+            hi: hi?.login?.invalid,
+            en: en?.login?.invalid,
+          });
+        }
       } else {
-        addToast({
-          type: 'error',
-          hi: hi?.login?.invalid,
-          en: en?.login?.invalid,
-        });
-        setShowCredit(false);
+        validteAndSendOtp();
       }
     } else {
       validteAndSendOtp();
     }
   };
 
+  const numberChecked = async (number: string) => {
+    const result = await getNumberChecked(number, true);
+    if (result?.message) {
+      return result?.message?.status ? true : false;
+    } else {
+      return false;
+    }
+  };
+
   const validateRequired = (): boolean => {
-    if (!credit_limit) {
+    if (!set_credit_limit) {
       addToast({
         type: 'error',
         hi: 'कृपया क्रेडिट लिमिट चुनें',
@@ -137,14 +212,14 @@ function NominationStepOne() {
     return true;
   };
 
-  const validteAndSendOtp = () => {
+  const validteAndSendOtp = async () => {
     if (mobile.length > 10) {
       addToast({
         type: 'error',
         hi: hi?.login?.enter_number,
         en: en?.login?.enter_number,
       });
-    } else if (mobile == '7826844889') {
+    } else if (await numberChecked(mobile)) {
       addToast({
         type: 'success',
         hi: hi?.login?.otp_sent,
@@ -218,8 +293,8 @@ function NominationStepOne() {
                     label_1={hi?.credit_score?.set_credit_limit}
                     label_2={en?.credit_score?.set_credit_limit}
                     placeholder="Set Credit Limit"
-                    value={credit_limit}
-                    onChange={(val) => setStep3({ credit_limit: val })}
+                    value={set_credit_limit}
+                    onChange={(val) => setStep3({ set_credit_limit: val })}
                     options={[
                       {
                         label_1: '50000',

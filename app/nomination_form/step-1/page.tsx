@@ -10,7 +10,7 @@ import hi from '@/messages/hi.json';
 import en from '@/messages/en.json';
 import { addToast } from '@/components/error/toastStore';
 import AppHeader from '@/components/header/Appheader';
-import { validatAadhar, validatPan } from '@/services/api';
+import { validatAadhar, validatPan, validatDob } from '@/services/api';
 import NominationStepper from '@/components/nomination/NominationStepper';
 import { useNominationForm } from '../NominationFormProvider';
 
@@ -22,15 +22,16 @@ export default function NominationStepOne() {
     last_name,
     pincode,
     district,
-    area,
+    townvillage,
     permanent_address,
-    aadhaar,
-    pan,
-    dob,
+    aadhaar_number,
+    pan_number,
+    date_of_birth,
   } = form.step1;
 
   const [aadhaarValidated, setAadhaarValidated] = useState(false);
   const [panValidated, setPanValidated] = useState(false);
+  const [dobValidate, setDobValidate] = useState(false);
 
   const [nextLoading, setNextLoading] = useState(false);
 
@@ -44,15 +45,61 @@ export default function NominationStepOne() {
     if (!(name in form.step1)) return;
     const key = name as keyof typeof form.step1;
 
-    if (key === 'aadhaar') setAadhaarValidated(false);
-    if (key === 'pan') setPanValidated(false);
+    if (key === 'aadhaar_number') setAadhaarValidated(false);
+    if (key === 'pan_number') setPanValidated(false);
+    if (key === 'date_of_birth') setDobValidate(false);
 
     setStep1({ [key]: value });
   };
 
+  const validateDob = async (): Promise<boolean> => {
+    try {
+      const dob = (form.step1.date_of_birth || '').trim();
+
+      if (!dob) {
+        addToast({
+          type: 'error',
+          hi: 'कृपया जन्म तिथि दर्ज करें',
+          en: 'Please enter date of birth',
+        });
+        setDobValidate(false);
+        return false;
+      }
+      const res = await validatDob(dob);
+
+      const isValid = Boolean(res?.message?.status);
+
+      setDobValidate(isValid);
+
+      addToast({
+        type: isValid ? 'success' : 'error',
+        hi: isValid
+          ? 'जन्म तिथि सत्यापन सफल'
+          : 'आयु 18 वर्ष से अधिक होनी चाहिए',
+        en: isValid
+          ? 'Date of birth validated successfully'
+          : 'Age must be greater than 18',
+      });
+
+      return isValid;
+    } catch (error) {
+      console.error(error);
+
+      setDobValidate(false);
+
+      addToast({
+        type: 'error',
+        hi: 'जन्म तिथि सत्यापन असफल',
+        en: 'Date of birth validation failed',
+      });
+
+      return false;
+    }
+  };
+
   const validateAadhaar = async (): Promise<boolean> => {
     try {
-      const aadhaar = (form.step1.aadhaar || '').trim();
+      const aadhaar = (form.step1.aadhaar_number || '').trim();
 
       if (!aadhaar) {
         addToast({
@@ -91,7 +138,7 @@ export default function NominationStepOne() {
 
   const validatePan = async (): Promise<boolean> => {
     try {
-      const pan = (form.step1.pan || '').trim().toUpperCase();
+      const pan = (form.step1.pan_number || '').trim().toUpperCase();
 
       if (!pan) {
         addToast({
@@ -151,7 +198,7 @@ export default function NominationStepOne() {
       });
       return false;
     }
-    if (isEmpty(form.step1.aadhaar)) {
+    if (isEmpty(form.step1.aadhaar_number)) {
       addToast({
         type: 'error',
         hi: 'आधार नंबर आवश्यक है',
@@ -159,7 +206,7 @@ export default function NominationStepOne() {
       });
       return false;
     }
-    if (isEmpty(form.step1.pan)) {
+    if (isEmpty(form.step1.pan_number)) {
       addToast({
         type: 'error',
         hi: 'पैन नंबर आवश्यक है',
@@ -167,7 +214,7 @@ export default function NominationStepOne() {
       });
       return false;
     }
-    if (isEmpty(form.step1.dob)) {
+    if (isEmpty(form.step1.date_of_birth)) {
       addToast({
         type: 'error',
         hi: 'जन्म तिथि आवश्यक है',
@@ -189,11 +236,13 @@ export default function NominationStepOne() {
 
       let aOk = aadhaarValidated;
       let pOk = panValidated;
+      let dobOk = dobValidate;
 
       if (!aOk) aOk = await validateAadhaar();
       if (!pOk) pOk = await validatePan();
+      if (!dobOk) dobOk = await validateDob();
 
-      if (!aOk || !pOk) {
+      if (!aOk || !pOk || !dobOk) {
         return;
       }
 
@@ -288,8 +337,8 @@ export default function NominationStepOne() {
             />
 
             <Text
-              name="area"
-              value={form.step1.area}
+              name="townvillage"
+              value={form.step1.townvillage}
               onChange={handleChange}
               label_1={hi?.form?.area}
               label_2={en?.form?.area}
@@ -308,8 +357,8 @@ export default function NominationStepOne() {
             />
 
             <Text
-              name="aadhaar"
-              value={form.step1.aadhaar}
+              name="aadhaar_number"
+              value={form.step1.aadhaar_number}
               onChange={handleChange}
               label_1={hi?.form?.adhaar}
               label_2={en?.form?.adhaar}
@@ -321,8 +370,8 @@ export default function NominationStepOne() {
             />
 
             <Text
-              name="pan"
-              value={form.step1.pan}
+              name="pan_number"
+              value={form.step1.pan_number}
               onChange={handleChange}
               label_1={hi?.form?.pan}
               label_2={en?.form?.pan}
@@ -334,13 +383,16 @@ export default function NominationStepOne() {
             />
 
             <Text
-              name="dob"
-              value={form.step1.dob}
+              name="date_of_birth"
+              value={form.step1.date_of_birth}
               onChange={handleChange}
               label_1={hi?.form?.dob}
               label_2={en?.form?.dob}
               type="date"
               required
+              validate
+              validated={dobValidate}
+              onValidateClick={validateDob}
             />
           </Box>
 
