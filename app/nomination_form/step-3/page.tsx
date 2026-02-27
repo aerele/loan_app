@@ -123,7 +123,9 @@ function NominationStepOne() {
         return;
       }
 
-      router.push('/nomination_form/view_status');
+      router.push(
+        `/nomination_form/view_status?name=${encodeURIComponent(res?.name)}`
+      );
     } else if (fillOtp) {
       if (fillOtp) {
         if (otp.length >= 6 && (await verifyOtp(mobile, otp))) {
