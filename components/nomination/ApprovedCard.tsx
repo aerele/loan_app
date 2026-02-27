@@ -4,12 +4,7 @@ import { Box } from '@mui/material';
 import NominationCard from './NominationCard';
 import NominationCard2 from './NominationCard2';
 
-type NominationData = {
-  name: string;
-  id: string;
-  amount: number;
-  type: string;
-};
+type NominationData = Record<string, unknown>;
 
 type cardValue = {
   data: NominationData;
@@ -22,7 +17,7 @@ function ApprovedCard({ data, canReview }: cardValue) {
       {canReview ? (
         <Box>
           <NominationCard
-            key={data?.id}
+            key={data?.name as string}
             data={data}
             canReview={false}
             cardSx={{ borderLeft: '4px' }}
@@ -32,7 +27,7 @@ function ApprovedCard({ data, canReview }: cardValue) {
         </Box>
       ) : (
         <Box>
-          <NominationCard2 key={data?.id} data={data} />
+          <NominationCard2 key={data?.name as string} data={data} />
         </Box>
       )}
     </Box>

@@ -104,3 +104,12 @@ export const submitNominationForm = (payload: NominationSubmitPayload) => {
     { payload: payload }
   );
 };
+
+export const getDoc = (name: string) => {
+  return postFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.form.get_nomination_form',
+    {
+      name: name,
+    }
+  );
+};

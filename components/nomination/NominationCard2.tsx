@@ -3,12 +3,7 @@
 import { Box, Typography, Paper } from '@mui/material';
 import CheckCircleSharpIcon from '@mui/icons-material/CheckCircleSharp';
 
-type NominationData = {
-  name: string;
-  id: string;
-  amount: number;
-  type: string;
-};
+type NominationData = Record<string, unknown>;
 
 type cardValue = {
   data: NominationData;
@@ -31,9 +26,23 @@ function NominationCard2({ data }: cardValue) {
         <CheckCircleSharpIcon sx={{ fontSize: 30, color: '#A1A2A1' }} />
 
         <Box>
-          <Typography fontWeight={600}>{data?.name}</Typography>
+          <Typography fontWeight={600}>
+            {typeof data.full_name === 'string' ? data.full_name : ''}
+          </Typography>
           <Typography fontSize={12} color="#6B7280">
-            05 Jan 2024 • ₹{data?.amount.toLocaleString()}
+            05 Jan 2024 • ₹
+            {(() => {
+              const value = data.set_credit_limit;
+
+              if (typeof value === 'number') return value;
+
+              if (typeof value === 'string') {
+                const parsed = Number(value);
+                return Number.isFinite(parsed) ? parsed : 0;
+              }
+
+              return 0;
+            })()}
           </Typography>
         </Box>
       </Box>

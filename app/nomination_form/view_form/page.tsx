@@ -4,14 +4,14 @@ import ViewFormContent from '@/components/nomination/ViewFormContent';
 export default async function ViewFormPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string }>;
+  searchParams: Promise<{ view?: string; name?: string }>;
 }) {
   const params = await searchParams;
   const view = params.view === 'true';
-
+  const name = params.name;
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ViewFormContent view={view} />
+      <ViewFormContent view={view} name={name} />
     </Suspense>
   );
 }

@@ -7,8 +7,8 @@ import en from '@/messages/en.json';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Loan App',
-  description: 'Loan Management App',
+  title: 'JOSH Nomination App',
+  description: 'JOSH Nomination App For Woman Welfare',
   manifest: '/manifest.json',
   themeColor: '#000000',
 
