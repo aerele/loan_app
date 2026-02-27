@@ -113,3 +113,13 @@ export const getDoc = (name: string) => {
     }
   );
 };
+
+export const approveDoc = (name: string, credit_limit: string) => {
+  return postFrappe<CustomApiMessage>(
+    '/api/method/nomination.api.form.approve_form',
+    {
+      name: name,
+      credit_limit: credit_limit,
+    }
+  );
+};
