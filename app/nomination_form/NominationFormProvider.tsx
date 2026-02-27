@@ -14,22 +14,23 @@ export type NominationStep1Form = {
   last_name: string;
   pincode: string;
   district: string;
-  area: string;
+  townvillage: string;
   permanent_address: string;
-  aadhaar: string;
-  pan: string;
-  dob: string;
+  aadhaar_number: string;
+  pan_number: string;
+  date_of_birth: string;
 };
 
 export type NominationStep2Form = {
-  sector: 'farm' | 'nonfarm';
-  businessType: string;
+  sector: 'farm_based' | 'non_farm';
+  business_category: string;
   supportNeeded: string[];
 };
 
 export type NominationStep3Form = {
   credit_score: string;
-  credit_limit: string;
+  mobile_number: string;
+  set_credit_limit: string;
 };
 
 type NominationFormState = {
@@ -48,20 +49,21 @@ const initialState: NominationFormState = {
     last_name: '',
     pincode: '',
     district: '',
-    area: '',
+    townvillage: '',
     permanent_address: '',
-    aadhaar: '',
-    pan: '',
-    dob: '',
+    aadhaar_number: '',
+    pan_number: '',
+    date_of_birth: '',
   },
   step2: {
-    sector: 'farm',
-    businessType: '',
+    sector: 'farm_based',
+    business_category: '',
     supportNeeded: [],
   },
   step3: {
     credit_score: '',
-    credit_limit: '',
+    mobile_number: '',
+    set_credit_limit: '',
   },
 };
 
