@@ -201,20 +201,52 @@ export default function ViewFormContent({ view, name }: FormControlProps) {
       : s(en?.credit_score?.[scoreBandKey], '');
 
   const nomi_details = [
-    { h1: 'Full Name', h2: fullName || '-' },
-    { h1: 'Aadhaar Number', h2: s(formValues?.aadhaar_number, '-') },
-    { h1: 'PAN Number', h2: s(formValues?.pan_number, '-') },
-    { h1: 'Date of Birth', h2: s(formValues?.date_of_birth, '-') },
-    { h1: 'Pincode', h2: s(formValues?.pincode, '-') },
-    { h1: 'District', h2: s(formValues?.district, '-') },
-    { h1: 'Town / Village', h2: s(formValues?.townvillage, '-') },
-    { h1: 'Permanent Address', h2: s(formValues?.permanent_address, '-') },
+    { h1: hi?.form?.first_name, h2: en?.form?.first_name, h3: fullName || '-' },
+    {
+      h1: hi?.form?.adhaar,
+      h2: en?.form?.adhaar,
+      h3: s(formValues?.aadhaar_number, '-'),
+    },
+    {
+      h1: hi?.form?.pan,
+      h2: en?.form?.pan,
+      h3: s(formValues?.pan_number, '-'),
+    },
+    {
+      h1: hi?.form?.dob,
+      h2: en?.form?.dob,
+      h3: s(formValues?.date_of_birth, '-'),
+    },
+    {
+      h1: hi?.form?.pincode,
+      h2: en?.form?.pincode,
+      h3: s(formValues?.pincode, '-'),
+    },
+    {
+      h1: hi?.form?.dictrict,
+      h2: en?.form?.dictrict,
+      h3: s(formValues?.district, '-'),
+    },
+    {
+      h1: hi?.form?.area,
+      h2: en?.form?.area,
+      h3: s(formValues?.townvillage, '-'),
+    },
+    {
+      h1: hi?.form?.permanent_address,
+      h2: en?.form?.permanent_address,
+      h3: s(formValues?.permanent_address, '-'),
+    },
   ];
 
   const enterpricess_details = [
-    { h1: 'Sector Type', h2: sectorType || '-' },
-    { h1: 'Enterprise Type', h2: enterpriseType || '-' },
-    { h1: 'Support Needed', h2: supportNeeded || '-' },
+    { h1: 'क्षेत्र का प्रकार', h2: 'Sector Type', h3: sectorType || '-' },
+    { h1: 'उद्यम का प्रकार', h2: 'Enterprise Type', h3: enterpriseType || '-' },
+    {
+      h1: 'सहायता की आवश्यकता',
+      h2: 'Support Needed',
+      h3: supportNeeded || '-',
+    },
   ];
 
   return (
@@ -280,9 +312,11 @@ export default function ViewFormContent({ view, name }: FormControlProps) {
               <Title1
                 key={index}
                 h1={item.h1}
-                h2={item.h2 || '-'}
-                h1style={{ fontSize: 13, fontWeight: 300 }}
-                h2style={{ fontWeight: 600, fontSize: 14 }}
+                h2={item.h2}
+                h3={item.h3 || '-'}
+                h1style={{ fontSize: 13, fontWeight: 600, color: '#5c5b5b' }}
+                h2style={{ fontWeight: 300, fontSize: 14 }}
+                h3style={{ fontSize: 13, fontWeight: 600 }}
               />
             ))}
           </Box>
@@ -312,9 +346,11 @@ export default function ViewFormContent({ view, name }: FormControlProps) {
               >
                 <Title1
                   h1={item.h1}
-                  h2={item.h2 || '-'}
-                  h1style={{ fontSize: 13, fontWeight: 300 }}
-                  h2style={{ fontWeight: 600, fontSize: 14 }}
+                  h2={item.h2}
+                  h3={item.h3 || '-'}
+                  h1style={{ fontSize: 13, fontWeight: 600, color: '#5c5b5b' }}
+                  h2style={{ fontWeight: 300, fontSize: 14 }}
+                  h3style={{ fontSize: 13, fontWeight: 600 }}
                 />
               </Box>
             ))}

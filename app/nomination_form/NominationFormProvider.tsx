@@ -67,7 +67,7 @@ const initialState: NominationFormState = {
   },
 };
 
-type SubmitResult = { ok: true } | { ok: false; error: string };
+type SubmitResult = { ok: false; error: string } | { ok: true; name: string };
 
 type Ctx = {
   form: NominationFormState;
@@ -114,8 +114,15 @@ export function NominationFormProvider({
         ...form.step3,
       };
 
-      await submitNominationForm(payload);
-      return { ok: true };
+      const res = await submitNominationForm(payload);
+      const msg =
+        typeof res?.message?.msg === 'string'
+          ? res.message.msg
+          : Array.isArray(res?.message?.msg)
+            ? res.message.msg[0]
+            : 'Submitted successfully';
+
+      return { ok: true, name: msg };
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Submit failed';
       return { ok: false, error: msg };
