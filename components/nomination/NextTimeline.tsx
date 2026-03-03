@@ -8,14 +8,17 @@ import {
   TimelineContent,
   TimelineDot,
 } from '@mui/lab';
-import { Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import GroupsIcon from '@mui/icons-material/Groups';
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 
+import Title1 from '@/components/Titel1';
+
 type Step = {
-  title: string;
-  subtitle?: string;
+  h1: string;
+  h2: string;
+  h3?: string;
   active?: boolean;
 };
 
@@ -24,65 +27,80 @@ type Props = {
 };
 
 function NextTimeline({ steps }: Props) {
+  const iconList = [
+    <GroupsIcon key="groups-icon" />,
+    <ApartmentIcon key="apartment-icon" />,
+    <AccountBalanceIcon key="account-icon" />,
+  ];
+
   return (
     <Timeline
       position="right"
       sx={{
         p: 0,
         m: 0,
-        '& .MuiTimelineItem-root:before': {
-          flex: 0,
-          padding: 0,
-        },
+        '& .MuiTimelineItem-root:before': { flex: 0, p: 0 },
       }}
     >
-      {steps.map((step, index) => {
-        const iconList = [
-          <GroupsIcon key="groups-icon" />,
-          <ApartmentIcon key="apartment-icon" />,
-          <AccountBalanceIcon key="account-icon" />,
-        ];
-
-        const isActive = step.active;
+      {steps.map((item, index) => {
+        const isActive = !!item.active;
 
         return (
-          <TimelineItem key={index}>
+          <TimelineItem key={`${item.h1}-${index}`} sx={{ minHeight: 72 }}>
             <TimelineSeparator>
               <TimelineDot
                 sx={{
                   bgcolor: isActive ? '#000' : '#E5E7EB',
-                  color: isActive ? '#fff' : '#6B7280',
-                  width: 40,
-                  height: 40,
+                  color: isActive ? '#fff' : '#9CA3AF',
+                  width: 44,
+                  height: 44,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  boxShadow: 'none',
+                  border: 'none',
                 }}
               >
-                {iconList[index]}
+                {iconList[index] ?? <GroupsIcon />}
               </TimelineDot>
 
               {index !== steps.length - 1 && (
                 <TimelineConnector
                   sx={{
-                    bgcolor: '#98999c',
+                    bgcolor: '#D1D5DB',
                     width: 2,
-                    height: '2rem',
+                    height: 56,
                   }}
                 />
               )}
             </TimelineSeparator>
 
-            <TimelineContent sx={{ py: 1 }}>
-              <Typography fontWeight={600} fontSize={14}>
-                {step.title}
-              </Typography>
-
-              {step.subtitle && (
-                <Typography fontSize={12} color="#6B7280">
-                  {step.subtitle}
-                </Typography>
-              )}
+            <TimelineContent sx={{ py: 0, mt: 0.5 }}>
+              <Box sx={{ opacity: isActive ? 1 : 0.55 }}>
+                <Title1
+                  h1={item.h1}
+                  h2={item.h2}
+                  h3={item.h3 || '-'}
+                  h1style={{
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: isActive ? '#111827' : '#6B7280',
+                    lineHeight: 1.5,
+                  }}
+                  h2style={{
+                    fontWeight: 500,
+                    fontSize: 11,
+                    color: '#6B7280',
+                    lineHeight: 1.5,
+                  }}
+                  h3style={{
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: '#6B7280',
+                    lineHeight: 1.5,
+                  }}
+                />
+              </Box>
             </TimelineContent>
           </TimelineItem>
         );

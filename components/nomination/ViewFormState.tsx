@@ -18,6 +18,24 @@ type FormControlProps = {
 type FormValues = Record<string, unknown>;
 const s = (v: unknown, fallback = ''): string =>
   typeof v === 'string' ? v : fallback;
+
+const formatApprovalDateTime = (dateTimeStr: unknown): string => {
+  const raw = s(dateTimeStr, '');
+  if (!raw) return '';
+
+  const iso = raw.replace(' ', 'T');
+  const dt = new Date(iso);
+  if (Number.isNaN(dt.getTime())) return raw;
+
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(dt);
+};
+
 function ViewFormStatus({ name }: FormControlProps) {
   const router = useRouter();
   const [formValues, setFormValues] = useState<FormValues | null>(null);
@@ -48,6 +66,63 @@ function ViewFormStatus({ name }: FormControlProps) {
     workflowState === 'VO Approved' || workflowState === 'CLF Approved';
 
   const clfActive = workflowState === 'CLF Approved';
+  const pendingEn = 'Pending review';
+  const pendingHi = 'समीक्षा लंबित';
+
+  const shgName = s(formValues?.owner);
+  const voName = s(formValues?.vo_approval_by);
+  const clfName = s(formValues?.clf_approval_by);
+
+  const voOn = formatApprovalDateTime(formValues?.vo_approved_on);
+  const clfOn = formatApprovalDateTime(formValues?.clf_approval_on);
+
+  const voLine =
+    voName && voOn
+      ? `Reviewed by: VO ${voName} on ${voOn}`
+      : voName
+        ? `Reviewed by: VO ${voName}`
+        : pendingEn;
+
+  const voLineHi =
+    voName && voOn
+      ? `समीक्षा की गई: VO ${voName} द्वारा, ${voOn}`
+      : voName
+        ? `समीक्षा की गई: VO ${voName} द्वारा`
+        : pendingHi;
+
+  const clfLine =
+    clfName && clfOn
+      ? `Reviewed by: CLF ${clfName} on ${clfOn}`
+      : clfName
+        ? `Reviewed by: CLF ${clfName}`
+        : pendingEn;
+
+  const clfLineHi =
+    clfName && clfOn
+      ? `समीक्षा की गई: CLF ${clfName} द्वारा, ${clfOn}`
+      : clfName
+        ? `समीक्षा की गई: CLF ${clfName} द्वारा`
+        : pendingHi;
+  const steps = [
+    {
+      h1: 'SHG Review - Maker',
+      h2: shgName ? `Reviewed by: SHG ${shgName}` : pendingEn,
+      h3: shgName ? `समीक्षा की गई: SHG ${shgName}` : pendingHi,
+      active: shgActive,
+    },
+    {
+      h1: 'VO Approval - Checker 1',
+      h2: voLine,
+      h3: voLineHi,
+      active: voActive,
+    },
+    {
+      h1: 'CLF Approval - Checker 2',
+      h2: clfLine,
+      h3: clfLineHi,
+      active: clfActive,
+    },
+  ];
   return (
     <Box
       sx={{
@@ -113,25 +188,7 @@ function ViewFormStatus({ name }: FormControlProps) {
         </Box>
 
         <Box>
-          <NextTimeline
-            steps={[
-              {
-                title: 'SHG Review - Maker',
-                subtitle: 'Reviewed by XYZ SHG',
-                active: shgActive,
-              },
-              {
-                title: 'VO Approval - Checker 1',
-                subtitle: 'Village Organization reviews the nomination.',
-                active: voActive,
-              },
-              {
-                title: 'CLF Approval',
-                subtitle: 'Final credit limit set and disbursement starts.',
-                active: clfActive,
-              },
-            ]}
-          />
+          <NextTimeline steps={steps} />
         </Box>
       </Box>
     </Box>
