@@ -163,7 +163,12 @@ export default function AppHeader({
                 <LogoutIcon fontSize="small" />
               </ListItemIcon>
               <Typography variant="inherit" sx={{ fontWeight: 500 }}>
-                Logout
+                <Title1
+                  h1="लॉग आउट"
+                  h2="Logout"
+                  h1style={{ fontSize: 14, fontWeight: 600 }}
+                  h2style={{ fontSize: 12 }}
+                />
               </Typography>
             </MenuItem>
           </Menu>
