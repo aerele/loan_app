@@ -210,16 +210,24 @@ export default function DashboardPage() {
 
             <Box sx={{ display: 'flex', gap: 2 }}>
               <StatsButtons
-                h1={hi.dashboard.submitted_nominatio}
-                h2={en.dashboard.submitted_nominatio}
+                h1={
+                  canReview
+                    ? hi.dashboard.pending
+                    : hi.dashboard.submitted_nominatio
+                }
+                h2={
+                  canReview
+                    ? en.dashboard.pending
+                    : en.dashboard.submitted_nominatio
+                }
                 count={nominations.length}
                 show={show.submitted}
                 onClick={() => handleStatsChange('submitted')}
               />
 
               <StatsButtons
-                h1={hi.dashboard.training}
-                h2={en.dashboard.training}
+                h1={canReview ? hi?.dashboard.approved : hi.dashboard.training}
+                h2={canReview ? en?.dashboard.approved : en.dashboard.training}
                 count={approved.length}
                 show={show.training}
                 onClick={() => handleStatsChange('training')}

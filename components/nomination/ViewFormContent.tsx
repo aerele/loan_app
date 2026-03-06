@@ -432,7 +432,20 @@ export default function ViewFormContent({ view, name }: FormControlProps) {
             {loading ? (
               <CircularProgress size={18} sx={{ color: '#fff' }} />
             ) : (
-              'Approve'
+              <Title1
+                h1={hi.nomi_form.approve}
+                h2={en.nomi_form.approve}
+                h1style={{
+                  fontWeight: 700,
+                  textAlign: 'center',
+                  fontSize: 15,
+                }}
+                h2style={{
+                  fontWeight: 400,
+                  fontSize: 12,
+                  textAlign: 'center',
+                }}
+              />
             )}
           </Button>
         )}

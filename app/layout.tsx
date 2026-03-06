@@ -3,6 +3,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import Providers from './providers';
 import ErrorStack from '@/components/error/ErrorStack';
 import en from '@/messages/en.json';
+import RoleGuard from '../components/RoleGuard';
 
 import type { Metadata } from 'next';
 
@@ -11,7 +12,6 @@ export const metadata: Metadata = {
   description: 'JOSH Nomination App For Woman Welfare',
   manifest: '/manifest.json',
   themeColor: '#000000',
-
   icons: {
     icon: [
       { url: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
@@ -34,7 +34,7 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <Providers messages={en}>
             <ErrorStack />
-            {children}
+            <RoleGuard>{children}</RoleGuard>
           </Providers>
         </AppRouterCacheProvider>
       </body>

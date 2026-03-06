@@ -20,7 +20,9 @@
     "credit_limit": "Credit Limit",
     "no_data": "No data available",
     "ent_type": "Enterprise Type",
-    "review": "Review Nomination"
+    "review": "Review Nomination",
+    "pending": "Pending",
+    "approved": "Approved"
   },
 
   "form": {
@@ -71,6 +73,7 @@
   "nomi_form": {
     "nomniee_title": "NOMINEE’S INFORMATION",
     "enterprises_title": "ENTERPRISE DETAILS",
-    "credit_bureau": "CREDIT BUREAU ASSESSMENT"
+    "credit_bureau": "CREDIT BUREAU ASSESSMENT",
+    "approve": "Approve"
   }
 }

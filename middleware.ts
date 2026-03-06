@@ -5,7 +5,7 @@ export function middleware(request: NextRequest) {
   const mobile = request.cookies.get('mobile')?.value;
   const { pathname } = request.nextUrl;
 
-  const publicRoutes = ['/login'];
+  const publicRoutes = ['/login', '/no-permission'];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   if (!mobile && !isPublicRoute) {
