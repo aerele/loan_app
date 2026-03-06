@@ -6,13 +6,13 @@ const nextConfig: NextConfig = {
       //for api
       {
         source: '/api/:path*',
-        destination: 'http://127.0.0.1:8005/api/:path*',
+        destination: 'https://rdb-staging.m.frappe.cloud/api/:path*',
       },
 
       //for files
       {
         source: '/files/:path*',
-        destination: 'http://127.0.0.1:8005/files/:path*',
+        destination: 'https://rdb-staging.m.frappe.cloud/files/:path*',
       },
     ];
   },
