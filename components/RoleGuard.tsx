@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { getUserRoles } from '@/app/utils/user';
+import Cookies from 'js-cookie';
 
 type Props = {
   children: React.ReactNode;
@@ -15,11 +16,22 @@ export default function RoleGuard({ children }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
     const checkRole = async () => {
       try {
+        const mobile = Cookies.get('mobile');
+
         if (pathname === '/login') {
-          setAllowed(true);
-          setLoading(false);
+          if (isMounted) {
+            setAllowed(true);
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (!mobile) {
+          router.replace('/login');
           return;
         }
 
@@ -40,15 +52,23 @@ export default function RoleGuard({ children }: Props) {
           return;
         }
 
-        setAllowed(true);
+        if (isMounted) {
+          setAllowed(true);
+        }
       } catch {
         router.replace('/no-permission');
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     checkRole();
+
+    return () => {
+      isMounted = false;
+    };
   }, [pathname, router]);
 
   if (loading) return null;
